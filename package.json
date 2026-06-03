@@ -1,9 +1,6 @@
 {
   "name": "kadotv-streaming-platform",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
   ],
   "scripts": {
     "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm run dev\"",
@@ -11,6 +8,5 @@
     "lint": "cd frontend && npm run lint && cd ../backend && npm run lint"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
   }
 }
