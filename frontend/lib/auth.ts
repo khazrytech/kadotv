@@ -16,7 +16,7 @@ export function verifyToken(request: NextRequest): AuthUser | null {
 
     const payload = jwt.verify(token, JWT_SECRET);
     return payload as AuthUser;
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }

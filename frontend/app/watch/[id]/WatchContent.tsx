@@ -77,6 +77,7 @@ export default function WatchContent() {
       <section className="relative bg-black">
         <div className="mx-auto max-w-7xl">
           <div className="relative aspect-video w-full bg-gray-900 overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={content.posterUrl}
               alt={content.title}
