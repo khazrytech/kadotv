@@ -1,30 +1,20 @@
 'use client';
 
-export async function generateStaticParams() {
-  return [];
-}
-
-export const dynamicParams = true;
-
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import ContentCard from '../../components/ContentCard';
-import { fetchMediaById, fetchMedia } from '../../../lib/api';
+import { movies, series } from '../../../lib/data';
 
 interface MediaItem {
   id: string;
   title: string;
   description: string;
-  category: string;
-  type: 'movie' | 'series' | 'sport';
-  posterUrl: string;
-  videoUrl: string;
-  previewUrl?: string;
-  rating: number;
-  tags: string[];
-  featured: boolean;
-  live: boolean;
+  genre: string;
+  type?: 'movie' | 'series' | 'sport';
+  image: string;
+  rating?: number;
+  featured?: boolean;
 }
 
 export default function WatchPage() {
@@ -33,20 +23,14 @@ export default function WatchPage() {
   const [related, setRelated] = useState<MediaItem[]>([]);
 
   useEffect(() => {
-    fetchMediaById(id).then((data: MediaItem | null) => {
-      if (data) {
-        setContent(data);
-      }
-    });
-  }, [id]);
-
-  useEffect(() => {
-    if (content) {
-      fetchMedia(1, 10, undefined, content.category)
-        .then((res: { data?: MediaItem[] }) => setRelated(res.data?.filter((m: MediaItem) => m.id !== content.id) || []))
-        .catch(() => setRelated([]));
+    const allMedia = [...movies, ...series];
+    const found = allMedia.find(m => m.id === id);
+    if (found) {
+      setContent(found as MediaItem);
+      const relatedItems = allMedia.filter(m => m.id !== id).slice(0, 3);
+      setRelated(relatedItems as MediaItem[]);
     }
-  }, [content]);
+  }, [id]);
 
   if (!content) {
     return (
@@ -59,15 +43,15 @@ export default function WatchPage() {
     );
   }
 
-  const isSeries = content.type === 'series';
+  const isSeries = 'seasons' in content;
 
   return (
     <main className="min-h-screen pt-20 text-white">
       <section className="relative bg-black">
         <div className="mx-auto max-w-7xl">
-          <div className="relative aspect-video w-full bg-surface-2 overflow-hidden">
+          <div className="relative aspect-video w-full bg-gray-900 overflow-hidden">
             <img
-              src={content.posterUrl}
+              src={content.image}
               alt={content.title}
               className="h-full w-full object-cover opacity-40"
             />
@@ -111,7 +95,7 @@ export default function WatchPage() {
           <div>
             <div className="flex flex-wrap items-start gap-4">
               <div className="flex-1">
-                <p className="text-sm uppercase tracking-[0.3em] text-blue-300">{content.category}</p>
+                <p className="text-sm uppercase tracking-[0.3em] text-blue-300">{content.genre}</p>
                 <h1 className="mt-2 text-4xl font-bold text-white">{content.title}</h1>
                 <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-400">
                   <span>2024</span>
@@ -156,7 +140,7 @@ export default function WatchPage() {
                 </div>
                 <div className="mt-4 space-y-3">
                   {[1, 2, 3].map(ep => (
-                    <div key={ep} className="flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-surface-2 p-4 hover:border-white/15 transition cursor-pointer group">
+                    <div key={ep} className="flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-gray-900 p-4 hover:border-white/15 transition cursor-pointer group">
                       <span className="text-2xl font-bold text-slate-600 w-8">{ep}</span>
                       <div className="flex-1">
                         <p className="font-semibold text-white">Episode {ep}</p>
@@ -180,10 +164,10 @@ export default function WatchPage() {
                   key={item.id}
                   id={item.id}
                   title={item.title}
-                  image={item.posterUrl}
-                  genre={item.category}
+                  image={item.image}
+                  genre={item.genre}
                   rating={item.rating}
-                  type={item.type}
+                  type={('seasons' in item) ? 'series' : 'movie'}
                 />
               ))}
             </div>
