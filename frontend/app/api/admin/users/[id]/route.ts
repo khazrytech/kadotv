@@ -3,11 +3,7 @@ import User from '@/lib/models/User';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 
-interface RouteParams {
-  params: { id: string };
-}
-
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authResult = requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;

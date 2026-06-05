@@ -3,11 +3,7 @@ import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
 
-interface RouteParams {
-  params: { id: string };
-}
-
-export async function GET(_request: NextRequest, { params }: RouteParams) {
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectToDatabase();
     const media = await Media.findById(params.id);
@@ -22,7 +18,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authResult = requireAuth(request);
     if (authResult instanceof NextResponse) return authResult;
@@ -41,7 +37,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authResult = requireAuth(request);
     if (authResult instanceof NextResponse) return authResult;

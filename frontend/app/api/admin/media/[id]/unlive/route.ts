@@ -3,11 +3,7 @@ import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 
-interface RouteParams {
-  params: { id: string };
-}
-
-export async function PATCH(_request: NextRequest, { params }: RouteParams) {
+export async function PATCH(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authResult = requireAdmin(_request);
     if (authResult instanceof NextResponse) return authResult;
