@@ -10,7 +10,6 @@ import 'swiper/css/pagination';
 import { heroData, sectionCards, movies, series, plans } from '../lib/data';
 import ContentCard from './components/ContentCard';
 import PlanCard from './components/PlanCard';
-import LiveBadge from './components/LiveBadge';
 
 const stats = [
   { value: '50M+', label: 'Active Users' },
@@ -20,26 +19,10 @@ const stats = [
 ];
 
 export default function HomePage() {
-  const [brunoImg, setBrunoImg] = useState('https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80');
-  const [mateusImg, setMateusImg] = useState('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&q=80');
-  const [mbeumoImg, setMbeumoImg] = useState('https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&q=80');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const intervals: ReturnType<typeof setInterval>[] = [];
-    const updateImage = (setter: (url: string) => void, query: string) => {
-      const url = `https://source.unsplash.com/800x600/?${query},${Math.random()}`;
-      setter(url);
-    };
-
-    intervals.push(setInterval(() => updateImage(setBrunoImg, 'bruno-fernandes'), 5000));
-    intervals.push(setInterval(() => updateImage(setMateusImg, 'matheus-cunha'), 5000));
-    intervals.push(setInterval(() => updateImage(setMbeumoImg, 'mbeumo'), 5000));
-
-    return () => {
-      intervals.forEach(clearInterval);
-    };
   }, []);
 
   const featuredMovies = movies.slice(0, 4);
@@ -49,166 +32,102 @@ export default function HomePage() {
     <main className="min-h-screen overflow-hidden text-white">
       {/* Hero */}
       <section className="relative h-screen w-full overflow-hidden bg-surface">
-        {/* Video background */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-40"
-          src="https://cdn.coverr.co/videos/coverr-soccer-drone-on-stadium-3882/1080p.mp4"
-        />
-
+        {/* Glow effect background */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
+        
         {/* Swiper carousel */}
         <Swiper
           modules={[Autoplay, Pagination]}
           spaceBetween={0}
           slidesPerView={1}
-          autoplay={{ delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+          autoplay={{ delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true }}
           loop
-          speed={1200}
+          speed={1500}
           className="absolute inset-0 h-full w-full"
-          pagination={{ clickable: true }}
+          pagination={{ clickable: true, el: '.swiper-pagination-custom' }}
         >
           {heroData.map((item) => (
             <SwiperSlide key={item.id}>
               <div className="relative h-full w-full">
                 <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/60 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/40" />
-                <div className="absolute inset-0 bg-gradient-to-b from-surface/50 via-transparent to-surface" />
+                <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/70 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/30" />
+                <div className="absolute inset-0 bg-gradient-to-b from-surface/40 via-transparent to-surface" />
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
 
-        {/* Movie posters in front (overlay) */}
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 20 }}>
-          <div className="absolute inset-0 flex items-center justify-center">
-            {featuredMovies.map((movie, idx) => (
-              <motion.div
-                key={movie.id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.1 }}
-                className="relative inline-block mx-4"
-              >
-                <img
-                  src={movie.image}
-                  alt={movie.title}
-                  className="h-48 w-36 object-cover rounded-lg shadow-2xl"
-                />
-                <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-black via-transparent to-transparent" />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Player cards — OUTSIDE Swiper, on top of everything */}
-        <div className="absolute bottom-24 right-6 hidden flex-row items-end gap-4 md:right-10 md:flex" style={{ zIndex: 30 }}>
-          <div className="relative h-32 w-24 overflow-hidden rounded-2xl border-2 border-white/20 shadow-2xl md:h-44 md:w-32">
-            <img src={brunoImg} alt="Bruno Fernandes" className="h-full w-full object-cover" />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-              <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white">Bruno Fernandes</p>
-            </div>
-          </div>
-          <div className="relative h-32 w-24 overflow-hidden rounded-2xl border-2 border-white/20 shadow-2xl md:h-44 md:w-32">
-            <img src={mateusImg} alt="Mateus Cunha" className="h-full w-full object-cover" />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-              <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white">Mateus Cunha</p>
-            </div>
-          </div>
-          <div className="relative h-32 w-24 overflow-hidden rounded-2xl border-2 border-white/20 shadow-2xl md:h-44 md:w-32">
-            <img src={mbeumoImg} alt="Mbeumo" className="h-full w-full object-cover" />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-              <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white">Mbeumo</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Hero text content */}
+        {/* Hero text content with glassmorphism */}
         <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-6 py-10 md:px-10">
-          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="max-w-2xl">
-            <div className="mb-6 flex items-center gap-3">
-              <LiveBadge />
-              <span className="text-xs uppercase tracking-[0.4em] text-slate-300">Champions League Final — Live Now</span>
-            </div>
-            <h1 className="text-5xl font-bold leading-tight text-white md:text-6xl lg:text-7xl">
-              Unlimited Sports,{' '}
+          <motion.div 
+            initial={{ opacity: 0, y: 50, scale: 0.95 }} 
+            animate={{ opacity: 1, y: 0, scale: 1 }} 
+            transition={{ duration: 0.8, ease: "easeOut" }} 
+            className="max-w-2xl p-8 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)]"
+          >
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: "100px" }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="h-1.5 rounded-full bg-gradient-to-r from-blue-400 via-violet-400 to-fuchsia-400 mb-6"
+            />
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white tracking-tight">
+              Unlimited Action,{' '}
               <span className="bg-gradient-to-r from-blue-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
                 Movies & Series
               </span>
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-slate-300">
-              Discover cinematic live sports, blockbuster movies, and premium series — all in one place. 4K HDR. No buffering.
+            <p className="mt-6 text-lg leading-8 text-slate-300">
+              Discover cinematic action, blockbuster movies, and premium series — all in one place. 4K HDR. No buffering.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
                 href="/browse"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 px-8 py-4 text-sm font-semibold text-white shadow-[0_0_30px_rgba(91,128,255,0.4)] transition hover:-translate-y-1"
+                className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 px-10 py-4 text-base font-semibold text-white shadow-[0_0_40px_rgba(91,128,255,0.5)] transition hover:-translate-y-1.5 hover:shadow-[0_0_60px_rgba(91,128,255,0.7)]"
                 id="hero-browse"
               >
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                 Start Watching
               </Link>
               <Link
-                href="/sports"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-4 text-sm text-white backdrop-blur-sm transition hover:bg-white/10"
-                id="hero-sports"
+                href="/movies"
+                className="inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-10 py-4 text-base text-white backdrop-blur-sm transition hover:bg-white/10 hover:border-white/30"
+                id="hero-movies"
               >
-                Live Sports →
+                Browse Movies →
               </Link>
             </div>
           </motion.div>
 
-          {/* Stats */}
+          {/* Stats with glassmorphism */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="absolute bottom-16 left-6 right-6 md:left-10 md:right-auto"
+            transition={{ delay: 1, duration: 0.8 }}
+            className="mt-12 flex flex-wrap gap-6"
           >
-            <div className="flex flex-wrap gap-8">
-              {stats.map(({ value, label }) => (
-                <div key={label}>
-                  <p className="text-2xl font-bold text-white">{value}</p>
-                  <p className="text-xs text-slate-400">{label}</p>
-                </div>
-              ))}
-            </div>
+            {stats.map(({ value, label }, idx) => (
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1 + idx * 0.1 }}
+                className="flex flex-col items-start gap-1 p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10"
+              >
+                <p className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">{value}</p>
+                <p className="text-sm uppercase tracking-wider text-slate-400">{label}</p>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
+
+        {/* Custom pagination */}
+        <div className="swiper-pagination-custom absolute bottom-10 left-1/2 -translate-x-1/2 z-20" />
       </section>
 
-      {/* Welcome Images (Eight) */}
-      {mounted && (
-        <section className="relative mb-16">
-          <div className="mx-auto max-w-7xl px-6 md:px-10">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {Array.from({ length: 8 }, (_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                  className="relative overflow-hidden rounded-xl bg-surface-2 shadow-glass"
-                >
-                  <img
-                    src={`https://source.unsplash.com/800x600/?movie,${Math.random() + i}`}
-                    alt={`Welcome ${i + 1}`}
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-sm font-medium text-white">
-                    Welcome {i + 1}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+
 
       {/* Featured Carousel */}
       <section className="mx-auto max-w-7xl px-6 py-16 md:px-10">
