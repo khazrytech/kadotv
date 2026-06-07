@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -16,15 +16,11 @@ const stats = [
   { value: '10K+', label: 'Titles Available' },
   { value: '200+', label: 'Live Sports Events' },
   { value: '4K', label: 'Ultra HD Quality' },
+  { value: '50K', label: 'More than Downloaded' },
 ];
 
 export default function HomePage() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+  const [mounted] = useState(true);
   const featuredMovies = movies.slice(0, 4);
   const featuredSeries = series.slice(0, 4);
 
@@ -126,8 +122,6 @@ export default function HomePage() {
         {/* Custom pagination */}
         <div className="swiper-pagination-custom absolute bottom-10 left-1/2 -translate-x-1/2 z-20" />
       </section>
-
-
 
       {/* Featured Carousel */}
       <section className="mx-auto max-w-7xl px-6 py-16 md:px-10">
