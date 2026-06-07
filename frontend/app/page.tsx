@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -20,7 +19,6 @@ const stats = [
 ];
 
 export default function HomePage() {
-  const [mounted] = useState(true);
   const featuredMovies = movies.slice(0, 4);
   const featuredSeries = series.slice(0, 4);
 
@@ -46,6 +44,7 @@ export default function HomePage() {
           {heroData.map((item) => (
             <SwiperSlide key={item.id}>
               <div className="relative h-full w-full">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/70 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/30" />
@@ -144,6 +143,7 @@ export default function HomePage() {
             <SwiperSlide key={item.id}>
               <Link href={`/watch/${item.id}`} className="block">
                 <motion.div whileHover={{ scale: 1.02 }} className="group relative overflow-hidden rounded-[28px] bg-surface-2 shadow-glass cursor-pointer">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.image} alt={item.title} className="h-[420px] w-full object-cover transition duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6">
