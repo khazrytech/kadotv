@@ -32,6 +32,7 @@ export default function ContentCard({
       <Link href={href} className="block">
         {/* Thumbnail */}
         <div className="relative overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image}
             alt={title}
