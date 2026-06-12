@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '@/lib/models/User';
 import { connectToDatabase } from '@/lib/db';
-export const runtime = 'edge';
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 export const runtime = 'edge';
 export async function POST(request: NextRequest) {
