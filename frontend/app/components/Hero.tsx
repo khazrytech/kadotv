@@ -54,8 +54,9 @@ export default function Hero() {
       >
         {heroData.map((item) => (
           <SwiperSlide key={item.id}>
-            <div className="relative h-full w-full">
-              <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
+              <div className="relative h-full w-full">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/60 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/40" />
               <div className="absolute inset-0 bg-gradient-to-b from-surface/50 via-transparent to-surface" />

@@ -108,6 +108,7 @@ export default function ProfilePage() {
           <div className="space-y-4">
             {watchHistory.map(item => (
               <div key={item.id} className="flex items-center gap-4 group cursor-pointer">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={item.image} alt={item.title} className="h-14 w-20 rounded-xl object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-white truncate">{item.title}</p>

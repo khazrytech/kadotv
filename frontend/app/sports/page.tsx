@@ -64,6 +64,7 @@ export default function SportsPage() {
                 className="group relative overflow-hidden rounded-2xl border border-red-500/20 bg-surface-2 shadow-[0_0_30px_rgba(239,68,68,0.08)] cursor-pointer hover:border-red-500/40 transition"
               >
                 <div className="relative h-40 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={match.image} alt={match.league} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-surface-2 to-transparent" />
                   <div className="absolute top-3 left-3"><LiveBadge /></div>
@@ -113,6 +114,7 @@ export default function SportsPage() {
                 className="group flex items-center gap-5 rounded-2xl border border-white/[0.07] bg-surface-2 p-5 transition hover:border-white/15 hover:bg-white/[0.04] cursor-pointer"
               >
                 <div className="h-14 w-14 overflow-hidden rounded-xl shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={fixture.image} alt={fixture.league} className="h-full w-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">

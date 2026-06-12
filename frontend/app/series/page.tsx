@@ -52,6 +52,7 @@ export default function SeriesPage() {
     <main className="min-h-screen text-white">
       {featured && (
         <section className="relative h-[70vh] overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={featured.posterUrl} alt={featured.title} className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-surface/80 via-transparent to-transparent" />

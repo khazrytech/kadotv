@@ -66,6 +66,7 @@ export default function DashboardPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {liveMatches.map(match => (
               <div key={match.id} className="flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-surface-2 p-4 hover:border-white/15 transition cursor-pointer">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={match.image} alt={match.league} className="h-14 w-14 rounded-xl object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-slate-400 truncate">{match.league}</p>
