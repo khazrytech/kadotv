@@ -3,16 +3,23 @@ import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 
-export async function PATCH(_request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authResult = requireAdmin(_request);
     if (authResult instanceof NextResponse) return authResult;
 
+    // Lazima u-await params kwanza ili kupata id
+    const { id } = await params;
+
     await connectToDatabase();
-    const media = await Media.findByIdAndUpdate(params.id, { featured: true }, { new: true });
+    
+    // Sasa tumia id uliyopata hapo juu
+    const media = await Media.findByIdAndUpdate(id, { featured: true }, { new: true });
+    
     if (!media) {
       return NextResponse.json({ message: 'Media not found' }, { status: 404 });
     }
+    
     return NextResponse.json({ media });
   } catch (error) {
     console.error('Feature media error:', error);
