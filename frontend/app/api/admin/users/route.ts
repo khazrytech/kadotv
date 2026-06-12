@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import User from '@/lib/models/User';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
-
+export const runtime = 'edge';
 export async function GET(request: NextRequest) {
   try {
     const authResult = requireAdmin(request);
