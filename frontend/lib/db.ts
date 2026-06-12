@@ -6,14 +6,13 @@ if (!MONGO_URI) {
   throw new Error('Please define MONGO_URI in your environment');
 }
 
-// Interface ya caching
 interface MongooseCache {
   conn: Connection | null;
   promise: Promise<Connection> | null;
 }
 
-// Extends global interface ili kuzuia type errors
 declare global {
+  // eslint-disable-next-line no-var
   var mongoose: MongooseCache;
 }
 
@@ -35,7 +34,6 @@ export async function connectToDatabase(): Promise<Connection> {
       serverSelectionTimeoutMS: 10000,
     };
 
-    // Tunahakikisha tuna-return connection object pekee
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongooseInstance) => {
       return mongooseInstance.connection;
     });
