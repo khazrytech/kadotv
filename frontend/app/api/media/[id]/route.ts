@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
-import { requireAuth } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth'; // Hakikisha path ya auth ni sahihi
 
-export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     await connectToDatabase();
-    const media = await Media.findById(params.id);
+    
+    const media = await Media.findById(id);
+    
     if (!media) {
       return NextResponse.json({ message: 'Media not found' }, { status: 404 });
     }
-
+    
     return NextResponse.json(media);
   } catch (error) {
     console.error('Get media by id error:', error);
@@ -18,18 +21,21 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = requireAuth(request);
+    const authResult = requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
+    const { id } = await params;
     await connectToDatabase();
+    
     const mediaData = await request.json();
-    const media = await Media.findByIdAndUpdate(params.id, mediaData, { new: true });
+    const media = await Media.findByIdAndUpdate(id, mediaData, { new: true });
+    
     if (!media) {
       return NextResponse.json({ message: 'Media not found' }, { status: 404 });
     }
-
+    
     return NextResponse.json(media);
   } catch (error) {
     console.error('Update media error:', error);
@@ -37,17 +43,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = requireAuth(request);
+    const authResult = requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
+    const { id } = await params;
     await connectToDatabase();
-    const media = await Media.findByIdAndDelete(params.id);
+    
+    const media = await Media.findByIdAndDelete(id);
+    
     if (!media) {
       return NextResponse.json({ message: 'Media not found' }, { status: 404 });
     }
-
+    
     return NextResponse.json({ message: 'Deleted' });
   } catch (error) {
     console.error('Delete media error:', error);
