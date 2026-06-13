@@ -8,6 +8,8 @@ export interface AuthUser {
   role: string;
 }
 
+export type AuthResult = AuthUser | NextResponse;
+
 export async function verifyToken(request: NextRequest): Promise<AuthUser | null> {
   try {
     const authorization = request.headers.get('authorization');
@@ -15,13 +17,13 @@ export async function verifyToken(request: NextRequest): Promise<AuthUser | null
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
-    return payload as AuthUser;
+    return payload as unknown as AuthUser;
   } catch {
     return null;
   }
 }
 
-export async function requireAuth(request: NextRequest) {
+export async function requireAuth(request: NextRequest): Promise<AuthResult> {
   const user = await verifyToken(request);
   if (!user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -29,7 +31,7 @@ export async function requireAuth(request: NextRequest) {
   return user;
 }
 
-export async function requireAdmin(request: NextRequest) {
+export async function requireAdmin(request: NextRequest): Promise<AuthResult> {
   const user = await verifyToken(request);
   if (!user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });

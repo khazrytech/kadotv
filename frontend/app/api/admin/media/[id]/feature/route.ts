@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
 import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
-export async function PATCH(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = requireAdmin(_request);
+    const authResult = await requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    // Lazima u-await params kwanza ili kupata id
     const { id } = await params;
 
     await connectToDatabase();

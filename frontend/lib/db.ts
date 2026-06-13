@@ -1,10 +1,6 @@
 import mongoose, { Connection } from 'mongoose';
 
-const MONGO_URI = process.env.MONGO_URI!;
-
-if (!MONGO_URI) {
-  throw new Error('Please define MONGO_URI in your environment');
-}
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || '';
 
 interface MongooseCache {
   conn: Connection | null;
@@ -23,6 +19,10 @@ if (!cached) {
 }
 
 export async function connectToDatabase(): Promise<Connection> {
+  if (!MONGO_URI) {
+    throw new Error('Please define MONGO_URI in your environment');
+  }
+
   if (cached.conn) {
     return cached.conn;
   }

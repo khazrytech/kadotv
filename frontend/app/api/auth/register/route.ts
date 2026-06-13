@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 import User from '@/lib/models/User';

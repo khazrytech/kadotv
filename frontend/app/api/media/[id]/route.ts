@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
 import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth'; // Hakikisha path ya auth ni sahihi
+import { requireAdmin } from '@/lib/auth';
+
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -25,7 +24,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = await requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
@@ -47,7 +46,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = await requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
