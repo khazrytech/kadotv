@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+export const runtime = 'edge';
+
 import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
