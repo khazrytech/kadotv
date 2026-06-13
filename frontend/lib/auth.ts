@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 
@@ -8,29 +8,29 @@ export interface AuthUser {
   role: string;
 }
 
-export function verifyToken(request: NextRequest): AuthUser | null {
+export async function verifyToken(request: NextRequest): Promise<AuthUser | null> {
   try {
     const authorization = request.headers.get('authorization');
     const token = authorization?.split(' ')[1];
     if (!token) return null;
 
-    const payload = jwt.verify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
     return payload as AuthUser;
   } catch {
     return null;
   }
 }
 
-export function requireAuth(request: NextRequest) {
-  const user = verifyToken(request);
+export async function requireAuth(request: NextRequest) {
+  const user = await verifyToken(request);
   if (!user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
   return user;
 }
 
-export function requireAdmin(request: NextRequest) {
-  const user = verifyToken(request);
+export async function requireAdmin(request: NextRequest) {
+  const user = await verifyToken(request);
   if (!user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
