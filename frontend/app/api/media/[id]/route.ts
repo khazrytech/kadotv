@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth'; // Hakikisha path ya auth ni sahihi
-export const runtime = 'edge';
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
