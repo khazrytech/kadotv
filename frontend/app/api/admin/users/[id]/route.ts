@@ -6,13 +6,21 @@ import User from '@/lib/models/User';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = requireAdmin(_request);
     if (authResult instanceof NextResponse) return authResult;
 
+    const { id } = await params;
+
     await connectToDatabase();
-    await User.findByIdAndDelete(params.id);
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+
     return NextResponse.json({ message: 'User deleted' });
   } catch (error) {
     console.error('Delete user error:', error);

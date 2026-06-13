@@ -5,7 +5,6 @@ export const runtime = 'edge';
 import User from '@/lib/models/User';
 import { connectToDatabase } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
-
 export async function GET(request: NextRequest) {
   try {
     const authResult = requireAdmin(request);
