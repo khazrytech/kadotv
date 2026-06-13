@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import Media from '@/lib/models/Media';
 import { connectToDatabase } from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
-export const runtime = 'edge';
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
