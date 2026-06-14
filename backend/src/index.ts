@@ -14,6 +14,10 @@ async function start() {
   await connectDatabase();
 
   const app = express();
+  
+  // Imerekebishwa: Tunaambia Express iamini proxy ya Render
+  app.set('trust proxy', 1);
+
   const server = http.createServer(app);
   const io = new Server(server, {
     cors: { origin: '*' }
