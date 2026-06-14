@@ -1,4 +1,9 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const RAW_BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+const API_BASE = RAW_BACKEND_URL.replace(/\/+$/, '').endsWith('/api')
+  ? RAW_BACKEND_URL.replace(/\/+$/, '')
+  : `${RAW_BACKEND_URL.replace(/\/+$/, '')}/api`;
 
 const getAuthHeaders = (): Record<string, string> => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
