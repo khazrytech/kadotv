@@ -1,53 +1,59 @@
 import express from 'express';
-import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
-import { Server } from 'socket.io';
-import { connectDatabase } from '../db';
-import { PORT } from '../config';
-import { apiRateLimiter } from '../middleware/rateLimiter';
-import authRoutes from '../routes/auth';
-import mediaRoutes from '../routes/media';
-import adminRoutes from '../routes/admin';
+import serverless from 'serverless-http';
+import { connectDatabase } from '../src/db';
+import { apiRateLimiter } from '../src/middleware/rateLimiter';
+import authRoutes from '../src/routes/auth';
+import mediaRoutes from '../src/routes/media';
+import adminRoutes from '../src/routes/admin';
 
-async function start() {
-  try {
-    console.log("🔄 Starting database connection...");
+declare global {
+  var _app: any;
+}
+
+const app = express();
+
+// Express iamini proxy ya Render ili rate limiter isilete shida
+app.set('trust proxy', 1);
+
+// Middleware
+app.use(helmet());
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
+app.use(express.json());
+app.use(apiRateLimiter);
+
+// Routes
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+app.use('/api/auth', authRoutes);
+app.use('/api/media', mediaRoutes);
+app.use('/api/admin', adminRoutes);
+
+// Export handler kwa ajili ya serverless (Vercel n.k)
+export const handler = async (req: any, res: any) => {
+  if (!global._app) {
     await connectDatabase();
-    console.log("🔋 Database ready, initializing Express...");
+    global._app = serverless(app as any);
+  }
+  return global._app(req, res);
+};
 
-    const app = express();
+// HII NDIYO SEHEMU YA RENDER
+const PORT = process.env.PORT || 10000;
+
+async function startRenderServer() {
+  try {
+    console.log("🔄 [Render] Inajaribu kuunganisha database...");
+    await connectDatabase();
     
-    app.set('trust proxy', 1);
-
-    const server = http.createServer(app);
-    const io = new Server(server, {
-      cors: { origin: '*' }
+    app.listen(PORT, () => {
+      console.log(`🚀 [Render] Server is running on port ${PORT}`);
     });
-
-    app.use(helmet());
-    app.use(cors({ origin: '*' }));
-    app.use(express.json());
-    app.use(apiRateLimiter);
-
-    app.get('/api/health', (_req: express.Request, res: express.Response) => res.json({ status: 'ok' }));
-    app.use('/api/auth', authRoutes);
-    app.use('/api/media', mediaRoutes);
-    app.use('/api/admin', adminRoutes);
-
-    io.on('connection', (socket) => {
-      console.log('Socket connected:', socket.id);
-      socket.emit('live-notification', { message: 'Welcome to KadoTV premium live edge.' });
-    });
-
-    server.listen(PORT, () => {
-      console.log(`🚀 Backend listening on port ${PORT}`);
-    });
-
   } catch (error) {
-    console.error('❌ Critical startup error:', error);
+    console.error("❌ [Render] Server imefeli kuwaka:", error);
     process.exit(1);
   }
 }
 
-start();
+// Tunawasha server ya Render
+startRenderServer();
