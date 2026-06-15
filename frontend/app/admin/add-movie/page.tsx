@@ -21,12 +21,11 @@ export default function AdminAddMovie() {
   const fetchMovie = async () => {
     if (!tmdbId) return alert("Ingiza TMDB ID");
     try {
-      // Hii lazima ifanane na file lililopo kwenye app/api/tmdb-fetch/route.ts
       const res = await fetch(`/api/tmdb-fetch?id=${tmdbId}`);
       if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
-    } catch (e) {
+    } catch (_e) { // Imerekebishwa kutoka 'e' kwenda '_e' ili kuondoa build error
       alert("Kosa: Hatujaipata hiyo movie. Hakikisha API route ipo.");
     }
   };
@@ -42,7 +41,7 @@ export default function AdminAddMovie() {
     setUrl('');
   };
 
-  // 2. Save data kwenye Backend yako
+  // 2. Save data kwenye Backend
   const handleSave = async () => {
     if (!movieData) return;
 
@@ -53,8 +52,7 @@ export default function AdminAddMovie() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          // Header hii ni muhimu sana kulingana na backend yako
-          'x-admin-key': 'KADOTV_SECRET_2026' 
+          'x-admin-key': 'KADOTV_SECRET_2026' // Hii ni muhimu kama ilivyo kwenye backend yako
         },
         body: JSON.stringify(payload)
       });
@@ -69,7 +67,7 @@ export default function AdminAddMovie() {
       alert("Muvi imehifadhiwa vizuri!");
       setMovieData(null);
       setDownloads([]);
-    } catch (error) {
+    } catch (_error) { // Imerekebishwa kutoka 'error' kwenda '_error' ili kuondoa build error
       alert("Kuna tatizo la mtandao.");
     }
   };
