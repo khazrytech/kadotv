@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState } from 'react';
 
 export default function AdminAddMovie() {
@@ -11,27 +10,26 @@ export default function AdminAddMovie() {
   const TMDB_API_KEY = '7f986e64c22a0567ea19d9718a2a00ef';
 
   const handleFetchFromTMDB = async () => {
-    if (!tmdbInput) return alert('Tafadhali weka TMDB ID!');
+    if (!tmdbInput) return alert('Weka TMDB ID!');
     setLoading(true);
     try {
-      const movieId = tmdbInput.split('-')[0].trim();
-      const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}`);
-      if (!res.ok) throw new Error('Muvi haijapatikana!');
+      const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbInput}?api_key=${TMDB_API_KEY}`);
+      if (!res.ok) throw new Error('Muvi haijapatikana TMDB!');
       const data = await res.json();
-
+      
       setGeneratedData({
         title: data.title,
         description: data.overview,
-        category: data.genres.map((g: any) => g.name).join(', '),
+        category: data.genres?.map((g: any) => g.name).join(', '),
         type: 'movie',
         posterUrl: `https://image.tmdb.org/t/p/w500${data.poster_path}`,
-        videoUrl: `https://vidsrc.to/embed/movie/${movieId}`,
-        rating: data.vote_average ? parseFloat(data.vote_average.toFixed(1)) : 0,
-        tags: [...data.genres.map((g: any) => g.name.toLowerCase()), 'trending'],
+        videoUrl: `https://vidsrc.to/embed/movie/${tmdbInput}`,
+        rating: data.vote_average || 0,
+        tags: ['trending'],
         featured: true,
         live: true
       });
-      setMessage({ text: `Muvi "${data.title}" imevutwa!`, type: 'success' });
+      setMessage({ text: 'Data imepatikana! Bonyeza Save.', type: 'success' });
     } catch (err: any) {
       setMessage({ text: err.message, type: 'error' });
     } finally {
@@ -40,28 +38,21 @@ export default function AdminAddMovie() {
   };
 
   const handleSaveToDatabase = async () => {
-    if (!generatedData) return;
     setLoading(true);
-
     try {
-      // HAPA NDIO TUNA-POINT KWENYE ROUTE MPYA NA KUTUMIA KEY YA SIRI
       const response = await fetch('https://kadotv.onrender.com/api/admin/add-movie', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-key': 'KADOTV_SECRET_2026' 
+          'x-admin-key': 'KADOTV_SECRET_2026'
         },
         body: JSON.stringify(generatedData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Imeferi! Angalia Admin Key.');
-      }
-
-      setMessage({ text: `🎉 Imefanikiwa! "${generatedData.title}" ipo LIVE.`, type: 'success' });
-      setTmdbInput('');
+      if (!response.ok) throw new Error('Imefeli! Angalia Admin Key.');
+      setMessage({ text: '🎉 Muvi ipo LIVE!', type: 'success' });
       setGeneratedData(null);
+      setTmdbInput('');
     } catch (err: any) {
       setMessage({ text: err.message, type: 'error' });
     } finally {
@@ -70,22 +61,17 @@ export default function AdminAddMovie() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white p-8 flex flex-col items-center">
-      <div className="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-2xl mt-10">
-        <h1 className="text-2xl font-bold mb-2 text-red-500">KadoTV Admin Panel</h1>
-        <input
-          type="text"
-          placeholder="TMDB ID..."
-          value={tmdbInput}
-          onChange={(e) => setTmdbInput(e.target.value)}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 mb-4 text-white"
+    <div className="p-8 bg-zinc-950 min-h-screen text-white">
+      <div className="max-w-md mx-auto bg-zinc-900 p-6 rounded-xl">
+        <input 
+          className="w-full bg-zinc-800 p-3 mb-4 rounded" 
+          placeholder="TMDB ID..." 
+          onChange={(e) => setTmdbInput(e.target.value)} 
         />
-        <button onClick={handleFetchFromTMDB} className="w-full bg-red-600 py-3 rounded-lg font-bold mb-4">
-          {loading ? 'Inatafuta...' : 'Vuta Data TMDB'}
-        </button>
-        {message.text && <div className={`p-4 mb-4 rounded ${message.type === 'success' ? 'bg-emerald-900' : 'bg-red-900'}`}>{message.text}</div>}
+        <button onClick={handleFetchFromTMDB} className="w-full bg-red-600 p-3 rounded mb-2 font-bold">Vuta Data</button>
+        {message.text && <p className="mb-4">{message.text}</p>}
         {generatedData && (
-          <button onClick={handleSaveToDatabase} className="w-full bg-emerald-600 py-3 rounded-lg font-bold">
+          <button onClick={handleSaveToDatabase} className="w-full bg-green-600 p-3 rounded font-bold">
             🚀 Save & Push to Database
           </button>
         )}
