@@ -1,0 +1,107 @@
+'use client';
+
+import { useState } from 'react';
+
+export default function AdminAddMovie() {
+  const [tmdbInput, setTmdbInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
+  const [generatedData, setGeneratedData] = useState<any>(null);
+
+  const TMDB_API_KEY = '7f986e64c22a0567ea19d9718a2a00ef';
+
+  const handleFetchFromTMDB = async () => {
+    if (!tmdbInput) return alert('Tafadhali weka TMDB ID au Slug!');
+    setLoading(true);
+    setMessage({ text: '', type: '' });
+    setGeneratedData(null);
+
+    // Kuchuja ID kutoka kwenye slug (mfano: 931285-mortal-kombat-ii -> 931285)
+    const movieId = tmdbInput.split('-')[0].trim();
+
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}&language=en-US`
+      );
+      
+      if (!res.ok) throw new Error('Muvi haijapatikana TMDB! Hakiki ID yako.');
+      
+      const data = await res.json();
+      
+      // Kuchukua aina za muvi (Genres)
+      const genres = data.genres.map((g: any) => g.name);
+      const categoryString = genres.join(', ');
+
+      const formattedMovie = {
+        title: data.title,
+        description: data.overview,
+        category: categoryString,
+        type: 'movie',
+        posterUrl: `https://image.tmdb.org/t/p/w500${data.poster_path}`,
+        videoUrl: `https://vidsrc.to/embed/movie/${movieId}`,
+        rating: parseFloat(data.vote_average.toFixed(1)),
+        tags: [...genres.map((g: string) => g.toLowerCase()), 'trending'],
+        featured: true,
+        live: true
+      };
+
+      setGeneratedData(formattedMovie);
+      setMessage({ text: `Imefanikiwa kuvuta: "${data.title}"! Hakiki kisha bofya Save.`, type: 'success' });
+    } catch (err: any) {
+      setMessage({ text: err.message, type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveToDatabase = async () => {
+    if (!generatedData) return;
+    setLoading(true);
+
+    try {
+      const response = await fetch('https://kadotv.onrender.com/api/media', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(generatedData),
+      });
+
+      if (!response.ok) throw new Error('Imefeli kuhifadhi kwenye Database ya Render.');
+
+      setMessage({ text: `🎉 "${generatedData.title}" imewekwa kwenye Database na ipo LIVE KadoTV!`, type: 'success' });
+      setTmdbInput('');
+      setGeneratedData(null);
+    } catch (err: any) {
+      setMessage({ text: err.message, type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-white p-8 flex flex-col items-center">
+      <div className="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-2xl mt-10">
+        <h1 className="text-2xl font-bold mb-2 text-red-500">KadoTV Auto-Movie Generator</h1>
+        <p className="text-zinc-400 text-sm mb-6">Weka ID au Slug kutoka TMDB ili mfumo ujaze kila kitu kiotomatiki (Aina ya muvi, picha, maelezo).</p>
+
+        <div className="flex gap-2 mb-6">
+          <input
+            type="text"
+            placeholder="Mfano: 931285 au 931285-mortal-kombat-ii"
+            value={tmdbInput}
+            onChange={(e) => setTmdbInput(e.target.value)}
+            className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500"
+          />
+          <button
+            onClick={handleFetchFromTMDB}
+            disabled={loading}
+            className="bg-red-600 hover:bg-red-700 disabled:bg-zinc-700 px-6 py-3 rounded-lg font-medium transition"
+          >
+            {loading ? 'Inatafuta...' : 'Generate JSON'}
+          </button>
+        </div>
+
+        {message.text && (
+          <div className={`p-4 rounded-lg mb-6 border text-sm ${
+            message.type === 'success' ? 'bg-emerald-950/50 border-emerald-800 text-emerald-400' : 'bg-rose-950/50
