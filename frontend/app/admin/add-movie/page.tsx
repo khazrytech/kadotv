@@ -24,7 +24,8 @@ export default function AdminAddMovie() {
       if (!res.ok) throw new Error("Imeshindwa kupata data");
       const data = await res.json();
       setMovieData(data);
-    } catch (_e) { // Imebadilishwa kuwa _e
+    } catch { 
+      // Imeondolewa variable ya kosa hapa
       alert("Kosa: Hatujaipata hiyo movie");
     }
   };
@@ -53,7 +54,8 @@ export default function AdminAddMovie() {
       alert("Muvi imehifadhiwa vizuri!");
       setMovieData(null);
       setDownloads([]);
-    } catch (_error) { // Imebadilishwa kuwa _error
+    } catch { 
+      // Imeondolewa variable ya kosa hapa
       alert("Kuna tatizo la muunganiko na Server.");
     }
   };
