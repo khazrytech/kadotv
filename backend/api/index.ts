@@ -3,23 +3,21 @@ import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import { Server } from 'socket.io';
-import { connectDatabase } from './db';
-import { PORT } from './config';
-import { apiRateLimiter } from './middleware/rateLimiter';
-import authRoutes from './routes/auth';
-import mediaRoutes from './routes/media';
-import adminRoutes from './routes/admin';
+import { connectDatabase } from '../db';
+import { PORT } from '../config';
+import { apiRateLimiter } from '../middleware/rateLimiter';
+import authRoutes from '../routes/auth';
+import mediaRoutes from '../routes/media';
+import adminRoutes from '../routes/admin';
 
 async function start() {
   try {
-    // 1. Hakikisha tunasubiri database iunganishwe KWANZA kabisa
     console.log("🔄 Starting database connection...");
     await connectDatabase();
     console.log("🔋 Database ready, initializing Express...");
 
     const app = express();
     
-    // Express iamini proxy ya Render
     app.set('trust proxy', 1);
 
     const server = http.createServer(app);
@@ -42,7 +40,6 @@ async function start() {
       socket.emit('live-notification', { message: 'Welcome to KadoTV premium live edge.' });
     });
 
-    // 2. Server inaanza kusikiliza HAPA baada ya kila kitu kuwa sawa
     server.listen(PORT, () => {
       console.log(`🚀 Backend listening on port ${PORT}`);
     });
