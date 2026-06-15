@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 
-// Presets za ukubwa wa file
 const SIZE_PRESETS: { [key: string]: string } = {
   '1080p': '1.5 GB',
   '720p': '800 MB',
@@ -18,7 +17,6 @@ export default function AdminAddMovie() {
   const [dlSize, setDlSize] = useState(SIZE_PRESETS['1080p']);
   const [category, setCategory] = useState('home');
 
-  // Vuta data kutoka TMDB
   const fetchMovie = async () => {
     if (!tmdbId) return alert("Ingiza TMDB ID");
     try {
@@ -31,46 +29,31 @@ export default function AdminAddMovie() {
     }
   };
 
-  // Badilisha Size kiotomatiki
   const handleQualityChange = (q: string) => {
     setDlQuality(q);
     setDlSize(SIZE_PRESETS[q] || '');
   };
 
-  // Ongeza link kwenye list
   const addDownloadOption = () => {
     if (!url) return alert("Weka URL");
     setDownloads([...downloads, { url, quality: dlQuality, size: dlSize }]);
     setUrl('');
   };
 
-  // SAVE KWENDA DATABASE (Kodi iliyoboreshwa)
   const handleSave = async () => {
     if (!movieData) return;
-
     const payload = { ...movieData, downloads, category };
-
     try {
       const res = await fetch('https://kadotv.onrender.com/api/media', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
-      // Ulinzi: Hapa ndipo tunazuia SyntaxError
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Kosa kutoka Server:", errorText);
-        alert(`Server imekataa! (Status: ${res.status}). Angalia Console.`);
-        return;
-      }
-
-      const data = await res.json();
+      if (!res.ok) throw new Error("Server imekataa");
       alert("Muvi imehifadhiwa vizuri!");
       setMovieData(null);
       setDownloads([]);
     } catch (error) {
-      console.error("Kosa la mtandao:", error);
       alert("Kuna tatizo la muunganiko na Server.");
     }
   };
@@ -79,7 +62,6 @@ export default function AdminAddMovie() {
     <div className="p-6 bg-zinc-900 text-white min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
       
-      {/* Search */}
       <div className="flex gap-2 mb-6">
         <input 
           className="bg-zinc-800 p-2 rounded w-full border border-zinc-700" 
@@ -96,7 +78,6 @@ export default function AdminAddMovie() {
             <h2 className="text-xl font-bold">{movieData.title}</h2>
           </div>
 
-          {/* Download Options */}
           <div className="bg-zinc-800 p-4 rounded">
             <h3 className="font-bold mb-3">Download Options:</h3>
             <input 
@@ -131,25 +112,6 @@ export default function AdminAddMovie() {
           </select>
 
           <button onClick={handleSave} className="w-full bg-green-600 py-4 rounded font-bold text-lg">SAVE MOVIE</button>
-        </div>
-      )}
-    </div>
-  );
-}
-              <option value="home">Home</option>
-              <option value="trending">Trending</option>
-              <option value="popular">Popular</option>
-              <option value="series">Series</option>
-            </select>
-          </div>
-
-          {/* 5. Save Button */}
-          <button 
-            onClick={handleSave} 
-            className="w-full bg-green-600 py-4 rounded font-bold text-lg hover:bg-green-500 shadow-lg"
-          >
-            SAVE MOVIE TO DATABASE
-          </button>
         </div>
       )}
     </div>
