@@ -3,6 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
+interface DownloadOption {
+  quality: string; // Mfano: "1080p", "720p"
+  size: string;    // Mfano: "1.2 GB", "800 MB"
+  url: string;
+}
+
 interface MovieData {
   title: string;
   description: string;
@@ -11,115 +17,71 @@ interface MovieData {
   videoUrl: string;
   poster?: string;
   posterUrl?: string;
+  downloads?: DownloadOption[]; // Hapa ndipo tunapoweka chaguo za download
 }
 
-// ILIVYOKUWA: export default function WatchContent({ movie })
-// SUTI MPYA: Haina mabano ya ({ movie }) kwa sababu inafanya fetch yenyewe hapa ndani!
 export default function WatchContent() {
   const params = useParams();
   const id = params?.id;
-
   const [movie, setMovie] = useState<MovieData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMovieData = async () => {
       if (!id) return;
       try {
-        setLoading(true);
-        // Inasoma kutoka backend yako ya Render
         const response = await fetch(`https://kadotv.onrender.com/api/media/${id}`); 
         const data = await response.json();
-
-        if (data) {
-          setMovie(data);
-        } else {
-          setError('Muvi haijapatikana kwenye database.');
-        }
+        setMovie(data);
       } catch (err) {
-        setError('Imeshindwa kupata data za muvi kutoka server.');
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchMovieData();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div style={{ color: '#fff', textAlign: 'center', padding: '100px', backgroundColor: '#0b0c10', minHeight: '100vh' }}>
-        <p>Inapakia video... Subiri kidogo.</p>
-      </div>
-    );
-  }
-
-  if (error || !movie || !movie.videoUrl) {
-    return (
-      <div style={{ color: '#fff', textAlign: 'center', padding: '100px', backgroundColor: '#0b0c10', minHeight: '100vh' }}>
-        <p>{error || 'Video haijapatikana au kiungo kina shida.'}</p>
-      </div>
-    );
-  }
-
-  // Mfumo unakagua kama link ni ya embed (VidSrc / 2Embed)
-  const isEmbedLink = 
-    movie.videoUrl.includes('vidsrc') || 
-    movie.videoUrl.includes('2embed') || 
-    movie.videoUrl.includes('embed');
+  if (loading) return <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">Inapakia...</div>;
+  if (!movie) return <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">Muvi haipatikani.</div>;
 
   return (
-    <div style={{ width: '100%', backgroundColor: '#0b0c10', color: '#fff', minHeight: '100vh' }}>
-      
-      {/* SEHEMU YA VIDEO PLAYER */}
-      <div style={{ width: '100%', backgroundColor: '#000', position: 'relative' }}>
-        {isEmbedLink ? (
-          /* NJIA YA 1: VidSrc au Embed yoyote - Tunafungua salama kupitia Iframe wetu */
-          <iframe
-            src={movie.videoUrl}
-            title={movie.title}
-            style={{
-              width: '100%',
-              aspectRatio: '16/9',
-              border: 'none',
-              display: 'block'
-            }}
-            allowFullScreen
-            scrolling="no"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          />
-        ) : (
-          /* NJIA YA 2: Direct .mp4 link */
-          <video
-            src={movie.videoUrl}
-            controls
-            poster={movie.poster || movie.posterUrl}
-            style={{
-              width: '100%',
-              aspectRatio: '16/9',
-              backgroundColor: '#000',
-              display: 'block'
-            }}
-          />
+    <div className="min-h-screen bg-zinc-950 text-white">
+      {/* Player Section */}
+      <div className="w-full bg-black">
+        <div className="max-w-6xl mx-auto aspect-video">
+           <iframe src={movie.videoUrl} className="w-full h-full border-none" allowFullScreen />
+        </div>
+      </div>
+
+      {/* Maelezo na Download Section */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-4">{movie.title}</h1>
+        
+        {/* DOWNLOAD OPTIONS */}
+        {movie.type.toLowerCase() === 'movie' && movie.downloads && movie.downloads.length > 0 && (
+          <div className="mt-8 bg-zinc-900 p-6 rounded-xl border border-zinc-800">
+            <h3 className="text-lg font-semibold mb-4 text-white">Chagua Quality ya Kudownload:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {movie.downloads.map((item, index) => (
+                <a
+                  key={index}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between bg-zinc-800 hover:bg-red-700 transition p-4 rounded-lg border border-zinc-700"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-bold text-lg">{item.quality}</span>
+                    <span className="text-xs text-zinc-400">Size: {item.size}</span>
+                  </div>
+                  <span className="text-sm font-bold bg-black/30 px-3 py-1 rounded">⬇️ Download</span>
+                </a>
+              ))}
+            </div>
+          </div>
         )}
       </div>
-
-      {/* SEHEMU YA MAELEZO */}
-      <div style={{ padding: '24px 16px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '8px' }}>
-          {movie.title}
-        </h1>
-        <div style={{ display: 'flex', gap: '12px', color: '#888', fontSize: '14px', marginBottom: '16px' }}>
-          <span>{movie.type ? movie.type.toUpperCase() : 'MOVIE'}</span>
-          {movie.rating > 0 && <span>⭐ {movie.rating}</span>}
-        </div>
-        <p style={{ color: '#ccc', fontSize: '16px', lineHeight: '1.6', maxWidth: '800px' }}>
-          {movie.description || 'Haina maelezo kwa sasa.'}
-        </p>
-      </div>
-
     </div>
   );
 }
