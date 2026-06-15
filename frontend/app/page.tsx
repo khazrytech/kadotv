@@ -221,7 +221,7 @@ export default function HomePage() {
                 id={movie._id} 
                 title={movie.title} 
                 image={movie.posterUrl || movie.poster || '/placeholder.jpg'} 
-                genre={movie.genre || ['Action']} 
+                genre={movie.genre?.join(', ') || 'Action'} 
                 rating={movie.rating || 7.5} 
                 year={movie.year || 2026} 
                 duration={movie.duration || '2h'} 
@@ -248,7 +248,7 @@ export default function HomePage() {
                 id={s._id} 
                 title={s.title} 
                 image={s.posterUrl || s.poster || '/placeholder.jpg'} 
-                genre={s.genre || ['Drama']} 
+                genre={s.genre?.join(', ') || 'Drama'} 
                 rating={s.rating || 8.0} 
                 type="series" 
               />
