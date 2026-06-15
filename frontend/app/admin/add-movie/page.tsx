@@ -1,103 +1,169 @@
 'use client';
-import React, { useState } from 'react';
+import { useState } from 'react';
+
+// Hizi ni presets za ukubwa wa faili (haitaji kuandika kwa mkono)
+const SIZE_PRESETS: { [key: string]: string } = {
+  '1080p': '1.5 GB',
+  '720p': '800 MB',
+  '480p': '400 MB',
+  '360p': '200 MB'
+};
 
 export default function AdminAddMovie() {
-  const [tmdbInput, setTmdbInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' });
-  const [generatedData, setGeneratedData] = useState<any>(null);
-
-  // States za download
-  const [dlUrl, setDlUrl] = useState('');
+  const [tmdbId, setTmdbId] = useState('');
+  const [movieData, setMovieData] = useState<any>(null); // Hapa ndipo data za muvi zinahifadhiwa
+  const [downloads, setDownloads] = useState<any[]>([]);
+  
+  // States kwa ajili ya form
+  const [url, setUrl] = useState('');
   const [dlQuality, setDlQuality] = useState('1080p');
-  const [dlSize, setDlSize] = useState('');
+  const [dlSize, setDlSize] = useState(SIZE_PRESETS['1080p']);
+  const [category, setCategory] = useState('home');
 
-  const TMDB_API_KEY = '7f986e64c22a0567ea19d9718a2a00ef';
-
-  const formatSize = (mb: number) => {
-    if (mb >= 1024) return (mb / 1024).toFixed(2) + ' GB';
-    return mb + ' MB';
-  };
-
-  const handleFetchFromTMDB = async () => {
-    if (!tmdbInput) return alert('Weka TMDB ID!');
-    setLoading(true);
-    setMessage({ text: 'Inatafuta...', type: 'success' });
-    
+  // 1. Vuta data za movie kutoka TMDB
+  const fetchMovie = async () => {
+    if (!tmdbId) return alert("Ingiza TMDB ID kwanza!");
     try {
-      const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbInput}?api_key=${TMDB_API_KEY}`);
-      if (!res.ok) throw new Error(`TMDB imekataa (Status: ${res.status})`);
+      // Badilisha '/api/tmdb-fetch' na endpoint yako inayovuta data za TMDB
+      const res = await fetch(`/api/tmdb-fetch?id=${tmdbId}`);
       const data = await res.json();
       
-      setGeneratedData({
-        title: data.title,
-        description: data.overview,
-        type: 'movie',
-        posterUrl: `https://image.tmdb.org/t/p/w500${data.poster_path}`,
-        videoUrl: `https://vidsrc.to/embed/movie/${tmdbInput}`,
-        rating: data.vote_average ? parseFloat(data.vote_average.toFixed(1)) : 0,
-        downloads: []
-      });
-      setMessage({ text: 'Data imepatikana!', type: 'success' });
-    } catch (err: any) {
-      setMessage({ text: `KOSA: ${err.message}`, type: 'error' });
-    } finally {
-      setLoading(false);
+      if (data && data.title) {
+        setMovieData(data); // Hii inaleta jina la muvi kwenye screen
+      } else {
+        alert("Muvi haikupatikana!");
+      }
+    } catch (error) {
+      alert("Kosa la kimtandao: " + error);
     }
   };
 
-  const addDownloadOption = () => {
-    if (!dlUrl || !dlSize) return alert('Jaza link na ukubwa (MB)!');
-    const newDownload = {
-      quality: dlQuality,
-      size: formatSize(parseInt(dlSize)),
-      url: dlUrl
-    };
-    setGeneratedData({ ...generatedData, downloads: [...(generatedData.downloads || []), newDownload] });
-    setDlUrl('');
-    setDlSize('');
+  // 2. Badilisha Size auto ukichagua Quality
+  const handleQualityChange = (q: string) => {
+    setDlQuality(q);
+    setDlSize(SIZE_PRESETS[q] || '');
   };
 
-  const handleSaveToDatabase = async () => {
-    setLoading(true);
+  // 3. Ongeza kwenye list ya downloads
+  const addDownloadOption = () => {
+    if (!url) return alert("Weka URL ya download!");
+    setDownloads([...downloads, { url, quality: dlQuality, size: dlSize }]);
+    setUrl(''); // Clear URL baada ya kuongeza
+  };
+
+  // 4. Save kila kitu kwenye database
+  const handleSave = async () => {
+    if (!movieData) return;
+
+    const payload = { 
+      ...movieData, 
+      downloads, 
+      category,
+      tmdbId // Tunahifadhi ID pia
+    };
+
     try {
-      const response = await fetch('https://kadotv.onrender.com/api/admin/add-movie', {
+      const res = await fetch('https://kadotv.onrender.com/api/media', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-key': 'KADOTV_SECRET_2026' },
-        body: JSON.stringify(generatedData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-      if (!response.ok) throw new Error('Save imefeli');
-      setMessage({ text: '🎉 Imehifadhiwa!', type: 'success' });
-      setGeneratedData(null);
-    } catch (err: any) {
-      setMessage({ text: `SAVE KOSA: ${err.message}`, type: 'error' });
-    } finally {
-      setLoading(false);
+      
+      if (res.ok) {
+        alert("Muvi imehifadhiwa vizuri!");
+        setMovieData(null); // Clear form baada ya kusave
+        setDownloads([]);
+      } else {
+        alert("Imeshindwa kusave kwenye database!");
+      }
+    } catch (error) {
+      console.error("Kosa:", error);
     }
   };
 
   return (
-    <div className="p-8 bg-zinc-950 min-h-screen text-white">
-      <div className="max-w-md mx-auto bg-zinc-900 p-6 rounded-xl border border-zinc-800">
-        <h1 className="text-xl font-bold mb-4">KadoTV Admin</h1>
-        <input className="w-full bg-zinc-800 p-3 mb-4 rounded" placeholder="TMDB ID..." value={tmdbInput} onChange={(e) => setTmdbInput(e.target.value)} />
-        <button onClick={handleFetchFromTMDB} disabled={loading} className="w-full bg-red-600 p-3 rounded mb-4">{loading ? '...' : 'Vuta Data'}</button>
-
-        {message.text && <div className={`p-3 mb-4 rounded text-sm ${message.type === 'success' ? 'bg-emerald-900' : 'bg-red-900'}`}>{message.text}</div>}
-
-        {generatedData && (
-          <div className="border-t border-zinc-700 pt-4 mt-4">
-            <h2 className="font-bold mb-2">Download Options:</h2>
-            <input className="w-full bg-zinc-800 p-2 mb-2 rounded" placeholder="URL" value={dlUrl} onChange={(e) => setDlUrl(e.target.value)} />
-            <input className="w-full bg-zinc-800 p-2 mb-2 rounded" placeholder="Size (MB)" value={dlSize} onChange={(e) => setDlSize(e.target.value)} type="number" />
-            <select className="w-full bg-zinc-800 p-2 mb-4 rounded" value={dlQuality} onChange={(e) => setDlQuality(e.target.value)}>
-              <option>1080p</option><option>720p</option>
-            </select>
-            <button onClick={addDownloadOption} className="w-full bg-blue-600 p-2 rounded mb-4">Ongeza Link</button>
-            <button onClick={handleSaveToDatabase} disabled={loading} className="w-full bg-green-600 p-3 rounded font-bold">🚀 Save</button>
-          </div>
-        )}
+    <div className="p-6 bg-zinc-900 text-white min-h-screen">
+      <h1 className="text-2xl font-bold mb-6">Admin Dashboard: Add Movie</h1>
+      
+      {/* 1. Search Bar - Hapa ndipo tunavuta jina */}
+      <div className="flex gap-2 mb-6">
+        <input 
+          className="bg-zinc-800 p-2 rounded w-full border border-zinc-700" 
+          placeholder="Ingiza TMDB ID (mfano: 12345)" 
+          value={tmdbId}
+          onChange={(e) => setTmdbId(e.target.value)} 
+        />
+        <button onClick={fetchMovie} className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Vuta Data</button>
       </div>
+
+      {/* 2. Display ya Movie (Tutaona jina hapa baada ya ku-fetch) */}
+      {movieData && (
+        <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="bg-zinc-800 p-4 rounded border-l-4 border-green-500">
+            <h2 className="text-xl font-bold">{movieData.title}</h2>
+            <p className="text-sm text-zinc-400">{movieData.release_date}</p>
+          </div>
+
+          {/* 3. Download Options */}
+          <div className="bg-zinc-800 p-4 rounded">
+            <h3 className="font-bold mb-3 border-b border-zinc-700 pb-2">Download Options:</h3>
+            <input 
+              className="w-full bg-zinc-700 p-2 mb-2 rounded border border-zinc-600" 
+              placeholder="URL ya Download" 
+              value={url} 
+              onChange={(e) => setUrl(e.target.value)} 
+            />
+            <div className="flex gap-2">
+              <select 
+                className="bg-zinc-700 p-2 rounded w-1/3" 
+                value={dlQuality} 
+                onChange={(e) => handleQualityChange(e.target.value)}
+              >
+                {Object.keys(SIZE_PRESETS).map(q => <option key={q} value={q}>{q}</option>)}
+              </select>
+              <input 
+                className="w-full bg-zinc-700 p-2 rounded border border-zinc-600" 
+                value={dlSize} 
+                onChange={(e) => setDlSize(e.target.value)} 
+              />
+            </div>
+            <button onClick={addDownloadOption} className="w-full bg-blue-600 mt-3 p-2 rounded font-bold hover:bg-blue-500">Ongeza Link</button>
+            
+            {/* List ya links */}
+            <div className="mt-4 space-y-2">
+              {downloads.map((dl, i) => (
+                <div key={i} className="flex justify-between bg-black p-3 rounded text-sm items-center">
+                  <span>{dl.quality} - {dl.size}</span>
+                  <button onClick={() => setDownloads(downloads.filter((_, idx) => idx !== i))} className="text-red-400 hover:text-red-300">Futa</button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. Category */}
+          <div className="bg-zinc-800 p-4 rounded">
+            <label className="block mb-2 font-bold">Chagua Category:</label>
+            <select 
+              className="w-full bg-zinc-700 p-3 rounded" 
+              value={category} 
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="home">Home</option>
+              <option value="trending">Trending</option>
+              <option value="popular">Popular</option>
+              <option value="series">Series</option>
+            </select>
+          </div>
+
+          {/* 5. Save Button */}
+          <button 
+            onClick={handleSave} 
+            className="w-full bg-green-600 py-4 rounded font-bold text-lg hover:bg-green-500 shadow-lg"
+          >
+            SAVE MOVIE TO DATABASE
+          </button>
+        </div>
+      )}
     </div>
   );
 }
