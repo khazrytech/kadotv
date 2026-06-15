@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 export default function AdminAddMovie() {
   const [tmdbInput, setTmdbInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Sasa inatumika
   const [message, setMessage] = useState({ text: '', type: '' });
   const [generatedData, setGeneratedData] = useState<any>(null);
 
@@ -11,10 +11,10 @@ export default function AdminAddMovie() {
 
   const handleFetchFromTMDB = async () => {
     if (!tmdbInput) return alert('Weka TMDB ID!');
-    setLoading(true);
+    setLoading(true); // Inatumika hapa
     try {
       const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbInput}?api_key=${TMDB_API_KEY}`);
-      if (!res.ok) throw new Error('Muvi haijapatikana TMDB!');
+      if (!res.ok) throw new Error('Muvi haijapatikana!');
       const data = await res.json();
       
       setGeneratedData({
@@ -29,16 +29,16 @@ export default function AdminAddMovie() {
         featured: true,
         live: true
       });
-      setMessage({ text: 'Data imepatikana! Bonyeza Save.', type: 'success' });
+      setMessage({ text: 'Data imepatikana!', type: 'success' });
     } catch (err: any) {
       setMessage({ text: err.message, type: 'error' });
     } finally {
-      setLoading(false);
+      setLoading(false); // Inatumika hapa
     }
   };
 
   const handleSaveToDatabase = async () => {
-    setLoading(true);
+    setLoading(true); // Inatumika hapa
     try {
       const response = await fetch('https://kadotv.onrender.com/api/admin/add-movie', {
         method: 'POST',
@@ -56,7 +56,7 @@ export default function AdminAddMovie() {
     } catch (err: any) {
       setMessage({ text: err.message, type: 'error' });
     } finally {
-      setLoading(false);
+      setLoading(false); // Inatumika hapa
     }
   };
 
@@ -68,11 +68,19 @@ export default function AdminAddMovie() {
           placeholder="TMDB ID..." 
           onChange={(e) => setTmdbInput(e.target.value)} 
         />
-        <button onClick={handleFetchFromTMDB} className="w-full bg-red-600 p-3 rounded mb-2 font-bold">Vuta Data</button>
+        <button 
+          onClick={handleFetchFromTMDB} 
+          className="w-full bg-red-600 p-3 rounded mb-2 font-bold"
+        >
+          {loading ? 'Inatafuta...' : 'Vuta Data'} 
+        </button>
         {message.text && <p className="mb-4">{message.text}</p>}
         {generatedData && (
-          <button onClick={handleSaveToDatabase} className="w-full bg-green-600 p-3 rounded font-bold">
-            🚀 Save & Push to Database
+          <button 
+            onClick={handleSaveToDatabase} 
+            className="w-full bg-green-600 p-3 rounded font-bold"
+          >
+            {loading ? 'Inahifadhi...' : '🚀 Save & Push to Database'}
           </button>
         )}
       </div>
