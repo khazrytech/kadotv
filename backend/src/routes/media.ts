@@ -3,9 +3,8 @@ import { Media } from '../models/Media';
 
 const router = Router();
 
-// POST /api/media - create new media (Admin Key Protected)
+// 1. POST /api/media - Create new media (Admin Key Protected)
 router.post('/', async (req: Request, res: Response) => {
-  // Angalia Admin Key kutoka kwenye header
   const adminKey = req.headers['x-admin-key'];
   
   if (adminKey !== 'KADOTV_SECRET_2026') {
@@ -22,7 +21,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-// Hizi njia nyingine ziache kama zilivyo
+// 2. GET /api/media - Kupata list ya muvi zote
 router.get('/', async (req: Request, res: Response) => {
     try {
       const media = await Media.find().sort({ createdAt: -1 });
@@ -30,6 +29,22 @@ router.get('/', async (req: Request, res: Response) => {
     } catch (err) {
       res.status(500).json({ message: 'Server error' });
     }
+});
+
+// 3. GET /api/media/:id - KUPATA MUVI MOJA (Hii ndiyo fix ya 404!)
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const media = await Media.findById(id);
+    
+    if (!media) {
+      return res.status(404).json({ message: 'Muvi haipatikani kwenye database' });
+    }
+    
+    res.json(media);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err });
+  }
 });
 
 export default router;
