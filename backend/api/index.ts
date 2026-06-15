@@ -1,4 +1,14 @@
-// ... import zako zote zibaki vile vile ...
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
+import helmet from 'helmet';
+import { Server } from 'socket.io';
+import { connectDatabase } from './db';
+import { PORT } from './config';
+import { apiRateLimiter } from './middleware/rateLimiter';
+import authRoutes from './routes/auth';
+import mediaRoutes from './routes/media';
+import adminRoutes from './routes/admin';
 
 async function start() {
   try {
@@ -9,6 +19,7 @@ async function start() {
 
     const app = express();
     
+    // Express iamini proxy ya Render
     app.set('trust proxy', 1);
 
     const server = http.createServer(app);
@@ -21,12 +32,12 @@ async function start() {
     app.use(express.json());
     app.use(apiRateLimiter);
 
-    app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+    app.get('/api/health', (_req: express.Request, res: express.Response) => res.json({ status: 'ok' }));
     app.use('/api/auth', authRoutes);
     app.use('/api/media', mediaRoutes);
     app.use('/api/admin', adminRoutes);
 
-    io.on('connection', socket => {
+    io.on('connection', (socket) => {
       console.log('Socket connected:', socket.id);
       socket.emit('live-notification', { message: 'Welcome to KadoTV premium live edge.' });
     });
