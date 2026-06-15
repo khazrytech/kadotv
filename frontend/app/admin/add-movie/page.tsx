@@ -17,16 +17,17 @@ export default function AdminAddMovie() {
   const [dlSize, setDlSize] = useState(SIZE_PRESETS['1080p']);
   const [category, setCategory] = useState('home');
 
+  // 1. Fetch data kutoka TMDB
   const fetchMovie = async () => {
     if (!tmdbId) return alert("Ingiza TMDB ID");
     try {
+      // Hii lazima ifanane na file lililopo kwenye app/api/tmdb-fetch/route.ts
       const res = await fetch(`/api/tmdb-fetch?id=${tmdbId}`);
-      if (!res.ok) throw new Error("Imeshindwa kupata data");
+      if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
-    } catch { 
-      // Imeondolewa variable ya kosa hapa
-      alert("Kosa: Hatujaipata hiyo movie");
+    } catch (e) {
+      alert("Kosa: Hatujaipata hiyo movie. Hakikisha API route ipo.");
     }
   };
 
@@ -41,22 +42,35 @@ export default function AdminAddMovie() {
     setUrl('');
   };
 
+  // 2. Save data kwenye Backend yako
   const handleSave = async () => {
     if (!movieData) return;
+
     const payload = { ...movieData, downloads, category };
+
     try {
-      const res = await fetch('https://kadotv.onrender.com/api/media', {
+      const res = await fetch('https://kadotv.onrender.com/api/add-movie', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          // Header hii ni muhimu sana kulingana na backend yako
+          'x-admin-key': 'KADOTV_SECRET_2026' 
+        },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error("Server imekataa");
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Server Error:", errorText);
+        alert(`Server imekataa: ${res.status}`);
+        return;
+      }
+
       alert("Muvi imehifadhiwa vizuri!");
       setMovieData(null);
       setDownloads([]);
-    } catch { 
-      // Imeondolewa variable ya kosa hapa
-      alert("Kuna tatizo la muunganiko na Server.");
+    } catch (error) {
+      alert("Kuna tatizo la mtandao.");
     }
   };
 
