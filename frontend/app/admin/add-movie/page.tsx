@@ -25,7 +25,8 @@ export default function AdminAddMovie() {
       if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
-    } catch (_e) { // Imerekebishwa kutoka 'e' kwenda '_e' ili kuondoa build error
+    } catch { 
+      // Tumeondoa variable 'e' kabisa hapa
       alert("Kosa: Hatujaipata hiyo movie. Hakikisha API route ipo.");
     }
   };
@@ -52,7 +53,7 @@ export default function AdminAddMovie() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'x-admin-key': 'KADOTV_SECRET_2026' // Hii ni muhimu kama ilivyo kwenye backend yako
+          'x-admin-key': 'KADOTV_SECRET_2026' 
         },
         body: JSON.stringify(payload)
       });
@@ -67,7 +68,8 @@ export default function AdminAddMovie() {
       alert("Muvi imehifadhiwa vizuri!");
       setMovieData(null);
       setDownloads([]);
-    } catch (_error) { // Imerekebishwa kutoka 'error' kwenda '_error' ili kuondoa build error
+    } catch { 
+      // Tumeondoa variable 'error' kabisa hapa
       alert("Kuna tatizo la mtandao.");
     }
   };
