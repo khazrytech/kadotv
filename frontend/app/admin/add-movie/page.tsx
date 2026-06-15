@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 export default function AdminAddMovie() {
   const [tmdbInput, setTmdbInput] = useState('');
@@ -16,7 +16,6 @@ export default function AdminAddMovie() {
     setMessage({ text: '', type: '' });
     setGeneratedData(null);
 
-    // Kuchuja ID kutoka kwenye slug (mfano: 931285-mortal-kombat-ii -> 931285)
     const movieId = tmdbInput.split('-')[0].trim();
 
     try {
@@ -27,9 +26,7 @@ export default function AdminAddMovie() {
       if (!res.ok) throw new Error('Muvi haijapatikana TMDB! Hakiki ID yako.');
       
       const data = await res.json();
-      
-      // Kuchukua aina za muvi (Genres)
-      const genres = data.genres.map((g: any) => g.name);
+      const genres = data.genres ? data.genres.map((g: any) => g.name) : [];
       const categoryString = genres.join(', ');
 
       const formattedMovie = {
@@ -39,7 +36,7 @@ export default function AdminAddMovie() {
         type: 'movie',
         posterUrl: `https://image.tmdb.org/t/p/w500${data.poster_path}`,
         videoUrl: `https://vidsrc.to/embed/movie/${movieId}`,
-        rating: parseFloat(data.vote_average.toFixed(1)),
+        rating: data.vote_average ? parseFloat(data.vote_average.toFixed(1)) : 0,
         tags: [...genres.map((g: string) => g.toLowerCase()), 'trending'],
         featured: true,
         live: true
@@ -83,12 +80,12 @@ export default function AdminAddMovie() {
     <div className="min-h-screen bg-zinc-950 text-white p-8 flex flex-col items-center">
       <div className="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-2xl mt-10">
         <h1 className="text-2xl font-bold mb-2 text-red-500">KadoTV Auto-Movie Generator</h1>
-        <p className="text-zinc-400 text-sm mb-6">Weka ID au Slug kutoka TMDB ili mfumo ujaze kila kitu kiotomatiki (Aina ya muvi, picha, maelezo).</p>
+        <p className="text-zinc-400 text-sm mb-6">Weka ID au Slug kutoka TMDB ili mfumo ujaze kila kitu kiotomatiki.</p>
 
         <div className="flex gap-2 mb-6">
           <input
             type="text"
-            placeholder="Mfano: 931285 au 931285-mortal-kombat-ii"
+            placeholder="Mfano: 931285"
             value={tmdbInput}
             onChange={(e) => setTmdbInput(e.target.value)}
             className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500"
@@ -104,4 +101,33 @@ export default function AdminAddMovie() {
 
         {message.text && (
           <div className={`p-4 rounded-lg mb-6 border text-sm ${
-            message.type === 'success' ? 'bg-emerald-950/50 border-emerald-800 text-emerald-400' : 'bg-rose-950/50
+            message.type === 'success' 
+              ? 'bg-emerald-950/50 border-emerald-800 text-emerald-400' 
+              : 'bg-rose-950/50 border-rose-800 text-rose-400'
+          }`}>
+            {message.text}
+          </div>
+        )}
+
+        {generatedData && (
+          <div className="mt-4 border border-zinc-800 rounded-lg p-4 bg-zinc-950/50">
+            <h3 className="font-semibold text-lg mb-2 text-zinc-200">Muonekano wa Data Itakavyohifadhiwa:</h3>
+            <div className="space-y-2 text-sm text-zinc-400">
+              <p><strong className="text-zinc-200">Jina:</strong> {generatedData.title}</p>
+              <p><strong className="text-zinc-200">Aina:</strong> <span className="bg-zinc-800 px-2 py-0.5 rounded text-red-400 font-medium text-xs">{generatedData.category}</span></p>
+              <p><strong className="text-zinc-200">Maelezo:</strong> {generatedData.description}</p>
+            </div>
+
+            <button
+              onClick={handleSaveToDatabase}
+              disabled={loading}
+              className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition"
+            >
+              {loading ? 'Inahifadhi...' : '🚀 Save & Push to KadoTV Live'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
