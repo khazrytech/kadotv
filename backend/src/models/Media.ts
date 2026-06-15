@@ -1,5 +1,6 @@
-import { BaseMockModel } from './BaseMockModel';
+import mongoose from 'mongoose';
 
+// Interface ya TypeScript (Hii haibadiliki)
 export interface IMedia {
   id?: string;
   _id?: string;
@@ -9,52 +10,30 @@ export interface IMedia {
   type: 'movie' | 'series' | 'sport';
   posterUrl: string;
   videoUrl: string;
-  previewUrl?: string;
   rating: number;
   tags: string[];
   featured: boolean;
   live: boolean;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
-export class MediaClass extends BaseMockModel implements IMedia {
-  static dbName = 'Media';
+// Hapa ndipo tunaunganisha na MongoDB halisi
+const mediaSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  category: String,
+  type: String,
+  // Alias inatumika kuhakikisha 'posterUrl' kwenye kodi yako inasoma field ya 'poster' iliyo kule MongoDB
+  posterUrl: { type: String, alias: 'poster' }, 
+  videoUrl: String,
+  rating: { type: Number, default: 0 },
+  tags: [String],
+  featured: { type: Boolean, default: false },
+  live: { type: Boolean, default: false }
+}, { 
+  collection: 'movies', // Jina la collection yako kule MongoDB
+  timestamps: true 
+});
 
-  id: string;
-  _id: string;
-  title: string;
-  description: string;
-  category: string;
-  type: 'movie' | 'series' | 'sport';
-  posterUrl: string;
-  videoUrl: string;
-  previewUrl?: string;
-  rating: number;
-  tags: string[];
-  featured: boolean;
-  live: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-
-  constructor(data: Partial<IMedia>) {
-    super();
-    this.title = data.title || '';
-    this.description = data.description || '';
-    this.category = data.category || '';
-    this.type = data.type || 'movie';
-    this.posterUrl = data.posterUrl || '';
-    this.videoUrl = data.videoUrl || '';
-    this.previewUrl = data.previewUrl;
-    this.rating = data.rating || 0;
-    this.tags = data.tags || [];
-    this.featured = data.featured || false;
-    this.live = data.live || false;
-    this.id = data.id || data._id || Math.random().toString(36).substring(2, 15);
-    this._id = this.id;
-    if (data.createdAt) this.createdAt = data.createdAt;
-    if (data.updatedAt) this.updatedAt = data.updatedAt;
-  }
-}
-
-export const Media = MediaClass as any;
+// Hapa tunatengeneza Model ya Mongoose
+// Tunatumia 'mongoose.models.Media' ili kuzuia error ya "OverwriteModel" wakati wa development
+export const Media = mongoose.models.Media || mongoose.model('Media', mediaSchema);
