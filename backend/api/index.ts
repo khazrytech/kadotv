@@ -1,43 +1,45 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import serverless from 'serverless-http';
-import { connectDatabase } from '../src/db';
-import { apiRateLimiter } from '../src/middleware/rateLimiter';
-import authRoutes from '../src/routes/auth';
-import mediaRoutes from '../src/routes/media';
-import adminRoutes from '../src/routes/admin';
+// ... import zako zote zibaki vile vile ...
 
-declare global {
-  var _app: any;
+async function start() {
+  try {
+    // 1. Hakikisha tunasubiri database iunganishwe KWANZA kabisa
+    console.log("🔄 Starting database connection...");
+    await connectDatabase();
+    console.log("🔋 Database ready, initializing Express...");
+
+    const app = express();
+    
+    app.set('trust proxy', 1);
+
+    const server = http.createServer(app);
+    const io = new Server(server, {
+      cors: { origin: '*' }
+    });
+
+    app.use(helmet());
+    app.use(cors({ origin: '*' }));
+    app.use(express.json());
+    app.use(apiRateLimiter);
+
+    app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+    app.use('/api/auth', authRoutes);
+    app.use('/api/media', mediaRoutes);
+    app.use('/api/admin', adminRoutes);
+
+    io.on('connection', socket => {
+      console.log('Socket connected:', socket.id);
+      socket.emit('live-notification', { message: 'Welcome to KadoTV premium live edge.' });
+    });
+
+    // 2. Server inaanza kusikiliza HAPA baada ya kila kitu kuwa sawa
+    server.listen(PORT, () => {
+      console.log(`🚀 Backend listening on port ${PORT}`);
+    });
+
+  } catch (error) {
+    console.error('❌ Critical startup error:', error);
+    process.exit(1);
+  }
 }
 
-// Tunatengeneza app instance kwanza ili tuweze kuitumia kwenye serverless na listen
-const app = express();
-
-// Middleware
-app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
-app.use(express.json());
-app.use(apiRateLimiter);
-
-// Routes
-app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
-app.use('/api/auth', authRoutes);
-app.use('/api/media', mediaRoutes);
-app.use('/api/admin', adminRoutes);
-
-// Export handler kwa ajili ya serverless
-export const handler = async (req: express.Request, res: express.Response) => {
-  if (!global._app) {
-    await connectDatabase();
-    global._app = serverless(app as any);
-  }
-  return global._app(req, res);
-};
-
-// HII NDIYO SEHEMU YA KUIWEZESHA RENDER KUSIKILIZA KWENYE PORT
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+start();
