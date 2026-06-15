@@ -8,7 +8,6 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-// Tunabakisha hizi kwa ajili ya Hero na muundo wa kadi
 import { heroData, sectionCards, plans } from '../lib/data';
 import ContentCard from './components/ContentCard';
 import PlanCard from './components/PlanCard';
@@ -40,7 +39,6 @@ export default function HomePage() {
   const [liveMovies, setLiveMovies] = useState<LiveMedia[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Vuta data laivu kutoka Render pindi ukurasa unapofunguka
   useEffect(() => {
     const fetchLiveContent = async () => {
       try {
@@ -59,7 +57,6 @@ export default function HomePage() {
     fetchLiveContent();
   }, []);
 
-  // Kuchuja makundi tofauti kutoka kwenye database laivu
   const trendingContent = liveMovies.length > 0 ? liveMovies : [];
   const dynamicMovies = liveMovies.filter((m) => m.type?.toLowerCase() === 'movie').slice(0, 4);
   const dynamicSeries = liveMovies.filter((m) => m.type?.toLowerCase() === 'series').slice(0, 4);
@@ -309,64 +306,6 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative overflow-hidden py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(91,128,255,0.15),_transparent_60%)] pointer-events-none" />
-        <div className="relative mx-auto max-w-3xl px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-5xl font-bold text-white leading-tight">
-              Ready to watch?
-            </h2>
-            <p className="mt-4 text-slate-300 text-lg">
-              Join 50 million+ streamers. Start for free — no credit card required.
-            </p>
-            <div className="mt-10 flex flex-wrap justify-center gap-4">
-              <Link
-                href="/register"
-                id="cta-register"
-                className="rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 px-10 py-4 text-base font-semibold text-white shadow-[0_0_40px_rgba(91,128,255,0.35)] transition hover:-translate-y-1"
-              >
-                Get Started Free
-              </Link>
-              <Link
-                href="/browse"
-                className="rounded-full border border-white/20 bg-white/5 px-10 py-4 text-base text-white backdrop-blur-sm transition hover:bg-white/10"
-              >
-                Browse Content
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-    </main>
-  );
-}
-                <p className="mt-3 text-sm leading-7 text-slate-300">{card.copy}</p>
-                <div className="mt-6 flex flex-wrap gap-2 text-[0.78rem]">
-                  {card.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-slate-300">{tag}</span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="mx-auto max-w-7xl px-6 py-20 md:px-10">
-        <div className="mb-12 text-center">
-          <p className="text-sm uppercase tracking-[0.4em] text-blue-300">Pricing</p>
-          <h2 className="mt-2 text-4xl font-bold text-white">Simple, transparent pricing</h2>
-          <p className="mt-3 text-slate-400">No hidden fees. Cancel anytime.</p>
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {plans.map((plan, i) => (
-            <PlanCard key={plan.id} plan={plan} delay={i * 0.1} />
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
       <section className="relative overflow-hidden py-24">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(91,128,255,0.15),_transparent_60%)] pointer-events-none" />
         <div className="relative mx-auto max-w-3xl px-6 text-center">
