@@ -8,14 +8,17 @@ const SIZE_PRESETS: { [key: string]: string } = {
   '360p': '200 MB'
 };
 
+// Orodha ya kategoria zako
+const CATEGORIES = ['home', 'movies', 'series', 'trending', 'top-movies', 'popular-series'];
+
 export default function AdminAddMovie() {
   const [tmdbId, setTmdbId] = useState('');
+  const [category, setCategory] = useState(CATEGORIES[0]); // Default ya kwanza
   const [movieData, setMovieData] = useState<any>(null);
   const [downloads, setDownloads] = useState<any[]>([]);
   const [url, setUrl] = useState('');
   const [dlQuality, setDlQuality] = useState('1080p');
   const [dlSize, setDlSize] = useState(SIZE_PRESETS['1080p']);
-  const [category, setCategory] = useState('home');
 
   const fetchMovie = async () => {
     if (!tmdbId) return alert("Ingiza TMDB ID");
@@ -24,6 +27,8 @@ export default function AdminAddMovie() {
       if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
+      // Auto-fill URL ya VidSrc
+      setUrl(`https://vidsrc.to/embed/movie/${tmdbId}`);
     } catch (error) {
       console.error("Fetch Error:", error);
       alert("Kosa: Hatujaipata hiyo movie.");
@@ -49,7 +54,7 @@ export default function AdminAddMovie() {
         body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error("Server Error");
-      alert("Muvi imehifadhiwa vizuri!");
+      alert(`Muvi imehifadhiwa kwenye kategoria ya ${category}!`);
       setMovieData(null);
       setDownloads([]);
     } catch (error) {
@@ -61,14 +66,27 @@ export default function AdminAddMovie() {
   return (
     <div className="p-6 bg-zinc-900 text-white min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-      <div className="flex gap-2 mb-6">
-        <input 
-          className="bg-zinc-800 p-2 rounded w-full border border-zinc-700" 
-          placeholder="TMDB ID" 
-          value={tmdbId}
-          onChange={(e) => setTmdbId(e.target.value)} 
-        />
-        <button onClick={fetchMovie} className="bg-blue-600 px-4 py-2 rounded">Vuta Data</button>
+      
+      {/* SEHEMU YA KUCHAGUA KATEGORIA KABLA YA KUVUTA DATA */}
+      <div className="bg-zinc-800 p-4 rounded mb-6">
+        <label className="block mb-2 text-sm font-bold">Chagua Kategoria ya Movie:</label>
+        <select 
+          className="w-full bg-zinc-700 p-3 rounded mb-4" 
+          value={category} 
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat.toUpperCase()}</option>)}
+        </select>
+
+        <div className="flex gap-2">
+          <input 
+            className="bg-zinc-700 p-2 rounded w-full border border-zinc-600" 
+            placeholder="TMDB ID" 
+            value={tmdbId}
+            onChange={(e) => setTmdbId(e.target.value)} 
+          />
+          <button onClick={fetchMovie} className="bg-blue-600 px-6 py-2 rounded font-bold">Vuta Data</button>
+        </div>
       </div>
 
       {movieData && (
@@ -77,10 +95,10 @@ export default function AdminAddMovie() {
             <h2 className="text-xl font-bold">{movieData.title}</h2>
           </div>
           <div className="bg-zinc-800 p-4 rounded">
-            <h3 className="font-bold mb-3">Download Options:</h3>
+            <h3 className="font-bold mb-3">Download & Embed Options:</h3>
             <input 
               className="w-full bg-zinc-700 p-2 mb-2 rounded" 
-              placeholder="URL" 
+              placeholder="URL (VidSrc Link)" 
               value={url} 
               onChange={(e) => setUrl(e.target.value)} 
             />
@@ -94,22 +112,9 @@ export default function AdminAddMovie() {
               <input className="w-full bg-zinc-700 p-2 rounded" value={dlSize} onChange={(e) => setDlSize(e.target.value)} />
             </div>
             <button onClick={addDownloadOption} className="w-full bg-blue-600 mt-3 p-2 rounded font-bold">Ongeza Link</button>
-            <div className="mt-4 space-y-2">
-              {downloads.map((dl, i) => (
-                <div key={i} className="flex justify-between bg-black p-3 rounded text-sm items-center">
-                  <span>{dl.quality} - {dl.size}</span>
-                  <button onClick={() => setDownloads(downloads.filter((_, idx) => idx !== i))} className="text-red-400">Futa</button>
-                </div>
-              ))}
-            </div>
           </div>
-          <select className="w-full bg-zinc-800 p-3 rounded" value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option value="home">Home</option>
-            <option value="trending">Trending</option>
-            <option value="popular">Popular</option>
-            <option value="series">Series</option>
-          </select>
-          <button onClick={handleSave} className="w-full bg-green-600 py-4 rounded font-bold text-lg">SAVE MOVIE</button>
+          
+          <button onClick={handleSave} className="w-full bg-green-600 py-4 rounded font-bold text-lg">SAVE MOVIE KWA KATEGORIA: {category.toUpperCase()}</button>
         </div>
       )}
     </div>
