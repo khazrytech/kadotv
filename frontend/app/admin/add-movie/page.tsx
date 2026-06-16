@@ -17,16 +17,16 @@ export default function AdminAddMovie() {
   const [dlSize, setDlSize] = useState(SIZE_PRESETS['1080p']);
   const [category, setCategory] = useState('home');
 
-  // 1. Fetch data kutoka TMDB
+  // 1. Fetch data kutoka TMDB (Imebadilishwa hapa)
   const fetchMovie = async () => {
     if (!tmdbId) return alert("Ingiza TMDB ID");
     try {
-      const res = await fetch(`/api/tmdb-fetch?id=${tmdbId}`);
+      // Hapa ndipo tumebadilisha kutoka tmdb-fetch kwenda tmdbfetch
+      const res = await fetch(`/api/tmdbfetch?id=${tmdbId}`);
       if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
     } catch { 
-      // Tumeondoa variable 'e' kabisa hapa
       alert("Kosa: Hatujaipata hiyo movie. Hakikisha API route ipo.");
     }
   };
@@ -69,7 +69,6 @@ export default function AdminAddMovie() {
       setMovieData(null);
       setDownloads([]);
     } catch { 
-      // Tumeondoa variable 'error' kabisa hapa
       alert("Kuna tatizo la mtandao.");
     }
   };
