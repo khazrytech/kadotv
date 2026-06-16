@@ -20,12 +20,11 @@ export default function AdminAddMovie() {
   const fetchMovie = async () => {
     if (!tmdbId) return alert("Ingiza TMDB ID");
     try {
-      // Tunatumia njia sahihi ya api iliyopo ndani ya frontend
       const res = await fetch(`/api/tmdbfetch?id=${tmdbId}`);
       if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
-    } catch (_error) { 
+    } catch { 
       alert("Kosa: Hatujaipata hiyo movie. Hakikisha API route ipo.");
     }
   };
@@ -57,7 +56,7 @@ export default function AdminAddMovie() {
       alert("Muvi imehifadhiwa vizuri!");
       setMovieData(null);
       setDownloads([]);
-    } catch (_error) { 
+    } catch { 
       alert("Kuna tatizo la mtandao.");
     }
   };
