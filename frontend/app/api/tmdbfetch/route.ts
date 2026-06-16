@@ -20,7 +20,9 @@ export async function GET(request: NextRequest) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (e) { // eslint-disable-line
+  } catch (error) {
+    // Tuna-log kosa ili TypeScript ione variable inatumika
+    console.error("API Error:", error);
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }
