@@ -24,8 +24,8 @@ export default function AdminAddMovie() {
       if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
-    } catch { 
-      alert("Kosa: Hatujaipata hiyo movie. Hakikisha API route ipo.");
+    } catch (e) { // eslint-disable-line
+      alert("Kosa: Hatujaipata hiyo movie.");
     }
   };
 
@@ -56,7 +56,7 @@ export default function AdminAddMovie() {
       alert("Muvi imehifadhiwa vizuri!");
       setMovieData(null);
       setDownloads([]);
-    } catch { 
+    } catch (e) { // eslint-disable-line
       alert("Kuna tatizo la mtandao.");
     }
   };
