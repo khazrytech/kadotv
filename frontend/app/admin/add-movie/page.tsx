@@ -8,12 +8,11 @@ const SIZE_PRESETS: { [key: string]: string } = {
   '360p': '200 MB'
 };
 
-// Orodha ya kategoria zako
 const CATEGORIES = ['home', 'movies', 'series', 'trending', 'top-movies', 'popular-series'];
 
 export default function AdminAddMovie() {
   const [tmdbId, setTmdbId] = useState('');
-  const [category, setCategory] = useState(CATEGORIES[0]); // Default ya kwanza
+  const [category, setCategory] = useState(CATEGORIES[0]);
   const [movieData, setMovieData] = useState<any>(null);
   const [downloads, setDownloads] = useState<any[]>([]);
   const [url, setUrl] = useState('');
@@ -27,7 +26,6 @@ export default function AdminAddMovie() {
       if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
-      // Auto-fill URL ya VidSrc
       setUrl(`https://vidsrc.to/embed/movie/${tmdbId}`);
     } catch (error) {
       console.error("Fetch Error:", error);
@@ -41,6 +39,7 @@ export default function AdminAddMovie() {
     setUrl('');
   };
 
+  // HII NDIO KODI ILIYOREKEBISHWA ILI KUONYESHA KOSA HALISI
   const handleSave = async () => {
     if (!movieData) return;
     const payload = { ...movieData, downloads, category };
@@ -53,13 +52,19 @@ export default function AdminAddMovie() {
         },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error("Server Error");
-      alert(`Muvi imehifadhiwa kwenye kategoria ya ${category}!`);
+      
+      if (!res.ok) {
+        // Hapa tunasoma ujumbe wa kosa kutoka kwenye server
+        const errorData = await res.text();
+        throw new Error(`Status ${res.status}: ${errorData}`);
+      }
+      
+      alert(`Muvi imehifadhiwa vizuri kwenye ${category}!`);
       setMovieData(null);
       setDownloads([]);
     } catch (error) {
       console.error("Save Error:", error);
-      alert("Kuna tatizo la mtandao.");
+      alert("Kosa: " + error); // Hii itaonyesha kosa halisi kwenye screen yako
     }
   };
 
@@ -67,7 +72,6 @@ export default function AdminAddMovie() {
     <div className="p-6 bg-zinc-900 text-white min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
       
-      {/* SEHEMU YA KUCHAGUA KATEGORIA KABLA YA KUVUTA DATA */}
       <div className="bg-zinc-800 p-4 rounded mb-6">
         <label className="block mb-2 text-sm font-bold">Chagua Kategoria ya Movie:</label>
         <select 
@@ -98,7 +102,7 @@ export default function AdminAddMovie() {
             <h3 className="font-bold mb-3">Download & Embed Options:</h3>
             <input 
               className="w-full bg-zinc-700 p-2 mb-2 rounded" 
-              placeholder="URL (VidSrc Link)" 
+              placeholder="URL" 
               value={url} 
               onChange={(e) => setUrl(e.target.value)} 
             />
