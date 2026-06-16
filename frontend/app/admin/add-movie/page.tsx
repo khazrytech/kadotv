@@ -42,19 +42,20 @@ export default function AdminAddMovie() {
   const handleSave = async () => {
     if (!movieData) return;
     
-    // Hii ndiyo data tunayotuma kwenye server
+    // HAPA NDIPO UCHAWI WOTE ULIPO: Tunatengeneza data inavyotakiwa na Schema ya Backend
     const payload = { 
       title: movieData.title,
-      poster_path: movieData.poster_path || movieData.backdrop_path,
-      overview: movieData.overview,
-      category: category, 
-      downloads: downloads
+      description: movieData.overview || "Hakuna maelezo", // Schema inataka 'description'
+      poster: `https://image.tmdb.org/t/p/w500${movieData.poster_path || movieData.backdrop_path}`, // Schema inataka 'poster'
+      videoUrl: url || `https://vidsrc.to/embed/movie/${tmdbId}`, // Schema inataka 'videoUrl' na ni LAZIMA (required: true)
+      category: category,
+      type: 'movie', 
+      rating: movieData.vote_average || 0
     };
 
-    console.log("Data inayotumwa kwenye server:", payload); // Angalia hii kwenye F12 Console
+    console.log("Data inayotumwa kwenye server:", payload);
 
     try {
-      // HAPA TUNATUMIA /api/media (Kama tulivyoona kwenye mediaRoutes)
       const res = await fetch('https://kadotv.onrender.com/api/media', {
         method: 'POST',
         headers: { 
@@ -66,16 +67,17 @@ export default function AdminAddMovie() {
       
       if (!res.ok) {
         const errorData = await res.text();
-        throw new Error(errorData);
+        throw new Error(`Kosa la Server: ${errorData}`);
       }
       
-      alert(`Muvi imehifadhiwa vizuri kwenye ${category.toUpperCase()}!`);
+      alert(`Safi sana! Muvi imehifadhiwa vizuri kwenye kategoria ya ${category.toUpperCase()}!`);
       setMovieData(null);
       setDownloads([]);
       setTmdbId('');
-    } catch (error) {
+      setUrl('');
+    } catch (error: any) {
       console.error("Save Error:", error);
-      alert("Kosa: " + error);
+      alert("Kosa limejitokeza: " + error.message);
     }
   };
 
