@@ -42,16 +42,20 @@ export default function AdminAddMovie() {
   const handleSave = async () => {
     if (!movieData) return;
     
+    // Hii ndiyo data tunayotuma kwenye server
     const payload = { 
       title: movieData.title,
       poster_path: movieData.poster_path || movieData.backdrop_path,
       overview: movieData.overview,
-      category: category,
+      category: category, 
       downloads: downloads
     };
 
+    console.log("Data inayotumwa kwenye server:", payload); // Angalia hii kwenye F12 Console
+
     try {
-      const res = await fetch('https://kadotv.onrender.com/api/admin/add-movie', {
+      // HAPA TUNATUMIA /api/media (Kama tulivyoona kwenye mediaRoutes)
+      const res = await fetch('https://kadotv.onrender.com/api/media', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
