@@ -11,15 +11,18 @@ export async function GET(request: NextRequest) {
   try {
     const TMDB_API_KEY = process.env.TMDB_API_KEY; 
     
-    const res = await fetch(\https://api.themoviedb.org/3/movie/\?api_key=\&language=en-US\);
+    // Hapa ndipo ilipokuwa na kosa. URL lazima iwe kamili.
+    const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}&language=en-US`;
+    const res = await fetch(url);
     
     if (!res.ok) {
-      return NextResponse.json({ error: "Movie haijapatikana" }, { status: 404 });
+      // Tunarudisha status code kutoka TMDB ili tujue kosa ni nini
+      return NextResponse.json({ error: "Movie haijapatikana" }, { status: res.status });
     }
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch {
+  } catch (error) {
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }
