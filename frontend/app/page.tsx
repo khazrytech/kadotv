@@ -8,7 +8,7 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-import { heroData, sectionCards, plans } from '../lib/data';
+import { sectionCards, plans } from '../lib/data';
 import ContentCard from './components/ContentCard';
 import PlanCard from './components/PlanCard';
 
@@ -25,6 +25,7 @@ interface LiveMedia {
   posterUrl?: string;
   poster?: string;
   image?: string;
+  category?: string;
 }
 
 const stats = [
@@ -37,15 +38,23 @@ const stats = [
 
 export default function HomePage() {
   const [liveMovies, setLiveMovies] = useState<LiveMedia[]>([]);
+  const [heroMovies, setHeroMovies] = useState<LiveMedia[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLiveContent = async () => {
       try {
         const response = await fetch('https://kadotv.onrender.com/api/media');
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setLiveMovies(data);
+        const resData = await response.json();
+        
+        // Kagua kama data imekuja kama Object yenye { data: [...] } au safu (Array) ya kawaida
+        const finalData = Array.isArray(resData) ? resData : (resData.data || []);
+        
+        if (Array.isArray(finalData)) {
+          setLiveMovies(finalData);
+          
+          // IMEREKEBISHWA: Chukua muvi 5 za juu zilizoongezwa hivi karibuni kwa ajili ya Hero Section Slider
+          setHeroMovies(finalData.slice(0, 5));
         }
       } catch (error) {
         console.error('Imeshindwa kuvuta muvi kwenye Home:', error);
@@ -68,88 +77,84 @@ export default function HomePage() {
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
         
-        <Swiper
-          modules={[Autoplay, Pagination]}
-          spaceBetween={0}
-          slidesPerView={1}
-          autoplay={{ delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true }}
-          loop
-          speed={1500}
-          className="absolute inset-0 h-full w-full"
-          pagination={{ clickable: true, el: '.swiper-pagination-custom' }}
-        >
-          {heroData.map((item) => (
-            <SwiperSlide key={item.id}>
-              <div className="relative h-full w-full">
-                <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/70 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/30" />
-                <div className="absolute inset-0 bg-gradient-to-b from-surface/40 via-transparent to-surface" />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-6 py-10 md:px-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 50, scale: 0.95 }} 
-            animate={{ opacity: 1, y: 0, scale: 1 }} 
-            transition={{ duration: 0.8, ease: "easeOut" }} 
-            className="max-w-2xl p-8 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)]"
+        {/* IMEREKEBISHWA: Swiper sasa inasoma 'heroMovies' kutoka kwenye Database badala ya 'heroData' ya zamani */}
+        {!loading && heroMovies.length > 0 ? (
+          <Swiper
+            modules={[Autoplay, Pagination]}
+            spaceBetween={0}
+            slidesPerView={1}
+            autoplay={{ delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+            loop={heroMovies.length > 1}
+            speed={1500}
+            className="absolute inset-0 h-full w-full"
+            pagination={{ clickable: true, el: '.swiper-pagination-custom' }}
           >
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: "100px" }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="h-1.5 rounded-full bg-gradient-to-r from-blue-400 via-violet-400 to-fuchsia-400 mb-6"
-            />
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white tracking-tight">
-              Unlimited Action,{' '}
-              <span className="bg-gradient-to-r from-blue-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Movies & Series
-              </span>
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-slate-300">
-              Discover cinematic action, blockbuster movies, and premium series — all in one place. 4K HDR. No buffering.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Link
-                href="/browse"
-                className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 px-10 py-4 text-base font-semibold text-white shadow-[0_0_40px_rgba(91,128,255,0.5)] transition hover:-translate-y-1.5 hover:shadow-[0_0_60px_rgba(91,128,255,0.7)]"
-                id="hero-browse"
-              >
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                Start Watching
-              </Link>
-              <Link
-                href="/movies"
-                className="inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-10 py-4 text-base text-white backdrop-blur-sm transition hover:bg-white/10 hover:border-white/30"
-                id="hero-movies"
-              >
-                Browse Movies →
-              </Link>
-            </div>
-          </motion.div>
+            {heroMovies.map((item) => (
+              <SwiperSlide key={item._id}>
+                <div className="relative h-full w-full">
+                  {/* Picha ya Muvi kutoka kwenye database yako */}
+                  <img 
+                    src={item.poster || item.posterUrl || item.image || '/placeholder.jpg'} 
+                    alt={item.title} 
+                    className="h-full w-full object-cover" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/70 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/30" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-surface/40 via-transparent to-surface" />
+                  
+                  {/* IMEREKEBISHWA: Maandishi na maelezo ya kila muvi sasa yanabadilika kulingana na muvi inayoslaidi */}
+                  <div className="absolute inset-0 z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-6 py-10 md:px-10">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 30 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      transition={{ duration: 0.6 }}
+                      className="max-w-2xl p-8 rounded-3xl bg-surface/40 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+                    >
+                      <div className="h-1.5 rounded-full bg-gradient-to-r from-blue-400 via-violet-400 to-fuchsia-400 mb-6 w-[100px]" />
+                      <span className="bg-blue-500/20 text-blue-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">
+                        {item.category || item.type}
+                      </span>
+                      <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white tracking-tight">
+                        {item.title}
+                      </h1>
+                      <p className="mt-4 text-base leading-7 text-slate-300 line-clamp-3">
+                        {item.description || 'Gundua uhondo kamili wa video hii na maudhui mengine mazuri ndani ya KadoTV.'}
+                      </p>
+                      <div className="mt-8 flex flex-wrap gap-4">
+                        <Link
+                          href={`/watch/${item._id}`}
+                          className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 px-8 py-3.5 text-base font-semibold text-white shadow-[0_0_40px_rgba(91,128,255,0.5)] transition hover:-translate-y-1 hover:shadow-[0_0_60px_rgba(91,128,255,0.7)]"
+                        >
+                          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                          Tazama Sasa
+                        </Link>
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : (
+          /* Muonekano wa muda unapokuwa unatafuta muvi kwenye database */
+          <div className="absolute inset-0 flex items-center justify-center bg-surface">
+            <p className="text-slate-400 animate-pulse">Inaandaa Hero Slider...</p>
+          </div>
+        )}
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.8 }}
-            className="mt-12 flex flex-wrap gap-6"
-          >
-            {stats.map(({ value, label }, idx) => (
-              <motion.div
+        {/* Stats Section iliyopo juu ya Slider */}
+        <div className="absolute bottom-16 left-0 right-0 z-20 pointer-events-none hidden lg:block">
+          <div className="mx-auto max-w-7xl px-6 md:px-10 flex flex-wrap gap-6 justify-start">
+            {stats.map(({ value, label }) => (
+              <div
                 key={label}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1 + idx * 0.1 }}
                 className="flex flex-col items-start gap-1 p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10"
               >
-                <p className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">{value}</p>
-                <p className="text-sm uppercase tracking-wider text-slate-400">{label}</p>
-              </motion.div>
+                <p className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">{value}</p>
+                <p className="text-xs uppercase tracking-wider text-slate-400">{label}</p>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
 
         <div className="swiper-pagination-custom absolute bottom-10 left-1/2 -translate-x-1/2 z-20" />
