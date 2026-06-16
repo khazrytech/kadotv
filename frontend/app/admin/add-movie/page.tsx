@@ -39,12 +39,12 @@ export default function AdminAddMovie() {
     setUrl('');
   };
 
-  // HII NDIO KODI ILIYOREKEBISHWA ILI KUONYESHA KOSA HALISI
   const handleSave = async () => {
     if (!movieData) return;
     const payload = { ...movieData, downloads, category };
     try {
-      const res = await fetch('https://kadotv.onrender.com/api/add-movie', {
+      // HAPA NDIO TUMEREKEBISHA URL KUWA /api/admin/add-movie
+      const res = await fetch('https://kadotv.onrender.com/api/admin/add-movie', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -54,17 +54,17 @@ export default function AdminAddMovie() {
       });
       
       if (!res.ok) {
-        // Hapa tunasoma ujumbe wa kosa kutoka kwenye server
         const errorData = await res.text();
         throw new Error(`Status ${res.status}: ${errorData}`);
       }
       
-      alert(`Muvi imehifadhiwa vizuri kwenye ${category}!`);
+      alert(`Muvi imehifadhiwa vizuri kwenye ${category.toUpperCase()}!`);
       setMovieData(null);
       setDownloads([]);
+      setTmdbId('');
     } catch (error) {
       console.error("Save Error:", error);
-      alert("Kosa: " + error); // Hii itaonyesha kosa halisi kwenye screen yako
+      alert("Kosa: " + error);
     }
   };
 
