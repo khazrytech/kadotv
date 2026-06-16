@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Ongeza mstari huu hapa:
+export const runtime = 'edge';
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
@@ -21,7 +24,6 @@ export async function GET(request: NextRequest) {
     const data = await res.json();
     return NextResponse.json(data);
   } catch (error) {
-    // Tuna-log kosa ili TypeScript ione variable inatumika
     console.error("API Error:", error);
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
