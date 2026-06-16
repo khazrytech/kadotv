@@ -24,14 +24,10 @@ export default function AdminAddMovie() {
       if (!res.ok) throw new Error("Server imekataa");
       const data = await res.json();
       setMovieData(data);
-    } catch (e) { // eslint-disable-line
+    } catch (error) {
+      console.error("Fetch Error:", error);
       alert("Kosa: Hatujaipata hiyo movie.");
     }
-  };
-
-  const handleQualityChange = (q: string) => {
-    setDlQuality(q);
-    setDlSize(SIZE_PRESETS[q] || '');
   };
 
   const addDownloadOption = () => {
@@ -56,7 +52,8 @@ export default function AdminAddMovie() {
       alert("Muvi imehifadhiwa vizuri!");
       setMovieData(null);
       setDownloads([]);
-    } catch (e) { // eslint-disable-line
+    } catch (error) {
+      console.error("Save Error:", error);
       alert("Kuna tatizo la mtandao.");
     }
   };
@@ -88,7 +85,10 @@ export default function AdminAddMovie() {
               onChange={(e) => setUrl(e.target.value)} 
             />
             <div className="flex gap-2">
-              <select className="bg-zinc-700 p-2 rounded w-1/3" value={dlQuality} onChange={(e) => handleQualityChange(e.target.value)}>
+              <select className="bg-zinc-700 p-2 rounded w-1/3" value={dlQuality} onChange={(e) => {
+                  setDlQuality(e.target.value);
+                  setDlSize(SIZE_PRESETS[e.target.value] || '');
+              }}>
                 {Object.keys(SIZE_PRESETS).map(q => <option key={q} value={q}>{q}</option>)}
               </select>
               <input className="w-full bg-zinc-700 p-2 rounded" value={dlSize} onChange={(e) => setDlSize(e.target.value)} />
