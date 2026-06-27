@@ -138,9 +138,7 @@ export default function HomePage() {
           </Swiper>
         ) : (
           /* Muonekano wa muda unapokuwa unatafuta muvi kwenye database */
-          <div className="absolute inset-0 flex items-center justify-center bg-surface">
-            <p className="text-slate-400 animate-pulse">Inaandaa Hero Slider...</p>
-          </div>
+          <HeroSkeleton />
         )}
 
         {/* Stats Section iliyopo juu ya Slider */}
