@@ -11,6 +11,7 @@ import 'swiper/css/pagination';
 import { sectionCards, plans } from '../lib/data';
 import ContentCard from './components/ContentCard';
 import PlanCard from './components/PlanCard';
+import HeroSkeleton from './HeroSkeleton';
 
 interface LiveMedia {
   _id: string;
