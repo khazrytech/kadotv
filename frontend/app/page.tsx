@@ -138,7 +138,7 @@ export default function HomePage() {
           </Swiper>
         ) : (
           /* Muonekano wa muda unapokuwa unatafuta muvi kwenye database */
-          <HeroSkeleton />
+          <HeroSkeleton/>
         )}
 
         {/* Stats Section iliyopo juu ya Slider */}
