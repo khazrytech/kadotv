@@ -30,15 +30,15 @@ export default function LoginPage() {
 
   // Kazi ya Google Login
 //  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log("Karibu:", result.user.displayName);
-      router.push('/');
-    } catch (err: any) {
-      setError('Google login imeshindikana. Jaribu tena.');
-    } finally {
-      setLoading(false);
+ //   setLoading(true);
+  //  try {
+    //  const result = await signInWithPopup(auth, provider);
+    //  console.log("Karibu:", result.user.displayName);
+     // router.push('/');
+  //  } catch (err: any) {
+     // setError('Google login imeshindikana. Jaribu tena.');
+  //  } finally {
+    //  setLoading(false);
     }
   };
 
