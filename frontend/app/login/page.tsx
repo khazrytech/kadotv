@@ -29,7 +29,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   // Kazi ya Google Login
-  const handleGoogleLogin = async () => {
+//  const handleGoogleLogin = async () => {
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
