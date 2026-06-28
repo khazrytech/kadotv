@@ -8,14 +8,14 @@ import { useRouter } from 'next/navigation';
 //import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
 // Firebase Configuration yako
-const firebaseConfig = {
+/*const firebaseConfig = {
   apiKey: "AIzaSyBYtV4TrOuq1EvsYPvA9r0rPN4sXvx8dtQ",
   authDomain: "kadotv-6a6a6.firebaseapp.com",
   projectId: "kadotv-6a6a6",
   storageBucket: "kadotv-6a6a6.appspot.com",
   messagingSenderId: "721335767307",
   appId: "1:721335767307:web:275a701df864e266f0120e"
-//};
+};*/
 
 //const app = initializeApp(firebaseConfig);
 //const auth = getAuth(app);
