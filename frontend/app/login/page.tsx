@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 // Import hizi kutoka kwenye Firebase SDK
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+//import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+//import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
 // Firebase Configuration yako
 const firebaseConfig = {
@@ -17,9 +17,9 @@ const firebaseConfig = {
   appId: "1:721335767307:web:275a701df864e266f0120e"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+//const app = initializeApp(firebaseConfig);
+//const auth = getAuth(app);
+//const provider = new GoogleAuthProvider();
 
 export default function LoginPage() {
   const router = useRouter();
