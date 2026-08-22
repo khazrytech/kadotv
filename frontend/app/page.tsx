@@ -48,13 +48,10 @@ export default function HomePage() {
         const response = await fetch('https://kadotv.onrender.com/api/media');
         const resData = await response.json();
         
-        // Kagua kama data imekuja kama Object yenye { data: [...] } au safu (Array) ya kawaida
         const finalData = Array.isArray(resData) ? resData : (resData.data || []);
         
         if (Array.isArray(finalData)) {
           setLiveMovies(finalData);
-          
-          // IMEREKEBISHWA: Chukua muvi 5 za juu zilizoongezwa hivi karibuni kwa ajili ya Hero Section Slider
           setHeroMovies(finalData.slice(0, 5));
         }
       } catch (error) {
@@ -68,8 +65,8 @@ export default function HomePage() {
   }, []);
 
   const trendingContent = liveMovies.length > 0 ? liveMovies : [];
-  const dynamicMovies = liveMovies.filter((m) => m.type?.toLowerCase() === 'movie').slice(0, 4);
-  const dynamicSeries = liveMovies.filter((m) => m.type?.toLowerCase() === 'series').slice(0, 4);
+  const dynamicMovies = liveMovies.filter((m) => m.type?.toLowerCase() === 'movie').slice(0, 8);
+  const dynamicSeries = liveMovies.filter((m) => m.type?.toLowerCase() === 'series').slice(0, 8);
 
   return (
     <main className="min-h-screen overflow-hidden text-white">
@@ -78,7 +75,6 @@ export default function HomePage() {
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
         
-        {/* IMEREKEBISHWA: Swiper sasa inasoma 'heroMovies' kutoka kwenye Database badala ya 'heroData' ya zamani */}
         {!loading && heroMovies.length > 0 ? (
           <Swiper
             modules={[Autoplay, Pagination]}
@@ -93,7 +89,6 @@ export default function HomePage() {
             {heroMovies.map((item) => (
               <SwiperSlide key={item._id}>
                 <div className="relative h-full w-full">
-                  {/* Picha ya Muvi kutoka kwenye database yako */}
                   <img 
                     src={item.poster || item.posterUrl || item.image || '/placeholder.jpg'} 
                     alt={item.title} 
@@ -103,7 +98,6 @@ export default function HomePage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/30" />
                   <div className="absolute inset-0 bg-gradient-to-b from-surface/40 via-transparent to-surface" />
                   
-                  {/* IMEREKEBISHWA: Maandishi na maelezo ya kila muvi sasa yanabadilika kulingana na muvi inayoslaidi */}
                   <div className="absolute inset-0 z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-6 py-10 md:px-10">
                     <motion.div 
                       initial={{ opacity: 0, y: 30 }} 
@@ -137,11 +131,10 @@ export default function HomePage() {
             ))}
           </Swiper>
         ) : (
-          /* Muonekano wa muda unapokuwa unatafuta muvi kwenye database */
           <HeroSkeleton/>
         )}
 
-        {/* Stats Section iliyopo juu ya Slider */}
+        {/* Stats Section */}
         <div className="absolute bottom-16 left-0 right-0 z-20 pointer-events-none hidden lg:block">
           <div className="mx-auto max-w-7xl px-6 md:px-10 flex flex-wrap gap-6 justify-start">
             {stats.map(({ value, label }) => (
@@ -159,7 +152,7 @@ export default function HomePage() {
         <div className="swiper-pagination-custom absolute bottom-10 left-1/2 -translate-x-1/2 z-20" />
       </section>
 
-      {/* Featured Carousel (Trending Now & Live Sports) */}
+      {/* Featured Carousel */}
       <section className="mx-auto max-w-7xl px-6 py-16 md:px-10">
         <div className="mb-10">
           <p className="text-sm uppercase tracking-[0.4em] text-blue-300">Featured Collections</p>
@@ -209,7 +202,7 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* Movies Row */}
+      {/* Movies Row (Auto Adaptive Grid) */}
       <section className="mx-auto max-w-7xl px-6 py-8 md:px-10">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -218,7 +211,7 @@ export default function HomePage() {
           </div>
           <Link href="/movies" className="text-sm text-blue-400 hover:text-blue-300 transition">See all →</Link>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {dynamicMovies.map((movie, i) => (
             <motion.div key={movie._id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
               <ContentCard 
@@ -236,7 +229,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Series Row */}
+      {/* Series Row (Auto Adaptive Grid) */}
       <section className="mx-auto max-w-7xl px-6 py-8 md:px-10">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -245,7 +238,7 @@ export default function HomePage() {
           </div>
           <Link href="/series" className="text-sm text-blue-400 hover:text-blue-300 transition">See all →</Link>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {dynamicSeries.map((s, i) => (
             <motion.div key={s._id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
               <ContentCard 
@@ -341,3 +334,4 @@ export default function HomePage() {
     </main>
   );
 }
+
