@@ -87,7 +87,7 @@ export default function HomePage() {
             pagination={{ clickable: true, el: '.swiper-pagination-custom' }}
           >
             {heroMovies.map((item) => (
-              <SwiperSlide key={item._id}>
+              <SwiperSlide key={item._id || item.id}>
                 <div className="relative h-full w-full">
                   <img 
                     src={item.poster || item.posterUrl || item.image || '/placeholder.jpg'} 
@@ -103,21 +103,21 @@ export default function HomePage() {
                       initial={{ opacity: 0, y: 30 }} 
                       animate={{ opacity: 1, y: 0 }} 
                       transition={{ duration: 0.6 }}
-                      className="max-w-2xl p-8 rounded-3xl bg-surface/40 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+                      className="w-full max-w-xl mx-4 sm:mx-0 p-6 sm:p-8 rounded-3xl bg-surface/40 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)]"
                     >
                       <div className="h-1.5 rounded-full bg-gradient-to-r from-blue-400 via-violet-400 to-fuchsia-400 mb-6 w-[100px]" />
                       <span className="bg-blue-500/20 text-blue-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">
                         {item.category || item.type}
                       </span>
-                      <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white tracking-tight">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-white tracking-tight">
                         {item.title}
                       </h1>
-                      <p className="mt-4 text-base leading-7 text-slate-300 line-clamp-3">
+                      <p className="mt-4 text-sm sm:text-base leading-7 text-slate-300 line-clamp-3">
                         {item.description || 'Gundua uhondo kamili wa video hii na maudhui mengine mazuri ndani ya KadoTV.'}
                       </p>
                       <div className="mt-8 flex flex-wrap gap-4">
                         <Link
-                          href={`/watch/${item._id}`}
+                          href={`/watch/${item._id || item.id}`}
                           className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 px-8 py-3.5 text-base font-semibold text-white shadow-[0_0_40px_rgba(91,128,255,0.5)] transition hover:-translate-y-1 hover:shadow-[0_0_60px_rgba(91,128,255,0.7)]"
                         >
                           <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
@@ -176,8 +176,8 @@ export default function HomePage() {
             }}
           >
             {trendingContent.map((item) => (
-              <SwiperSlide key={item._id}>
-                <Link href={`/watch/${item._id}`} className="block">
+              <SwiperSlide key={item._id || item.id}>
+                <Link href={`/watch/${item._id || item.id}`} className="block">
                   <motion.div whileHover={{ scale: 1.02 }} className="group relative overflow-hidden rounded-[28px] bg-surface-2 shadow-glass cursor-pointer">
                     <img 
                       src={item.posterUrl || item.poster || item.image || '/placeholder.jpg'} 
@@ -213,9 +213,9 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {dynamicMovies.map((movie, i) => (
-            <motion.div key={movie._id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
+            <motion.div key={movie._id || movie.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
               <ContentCard 
-                id={movie._id} 
+                id={movie._id || movie.id || ''} 
                 title={movie.title} 
                 image={movie.posterUrl || movie.poster || '/placeholder.jpg'} 
                 genre={movie.genre?.join(', ') || 'Action'} 
@@ -240,9 +240,9 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {dynamicSeries.map((s, i) => (
-            <motion.div key={s._id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
+            <motion.div key={s._id || s.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
               <ContentCard 
-                id={s._id} 
+                id={s._id || s.id || ''} 
                 title={s.title} 
                 image={s.posterUrl || s.poster || '/placeholder.jpg'} 
                 genre={s.genre?.join(', ') || 'Drama'} 
@@ -334,3 +334,4 @@ export default function HomePage() {
     </main>
   );
 }
+
